@@ -76,6 +76,37 @@
         <p style="white-space: pre-wrap;">{{ course_info.description }}</p>
       </div>
     </el-card>
+	
+	
+	<!-- 新增：免费试看资源 -->
+	    <el-card shadow="never" class="desc-card" style="margin-top: 20px;">
+	      <template #header>
+	        <div class="card-header">
+	          <span><el-icon><Collection /></el-icon> 免费试看资源</span>
+	        </div>
+	      </template>
+	      
+	      <el-table :data="free_resources" v-if="free_resources.length > 0">
+	        <el-table-column prop="resource_name" label="资料名称" />
+	        <el-table-column label="类型" width="100">
+	          <template #default="scope">
+	            <el-tag size="small">{{ scope.row.resource_type === 1 ? '视频' : '课件' }}</el-tag>
+	          </template>
+	        </el-table-column>
+	        <el-table-column label="操作" width="120">
+	          <template #default="scope">
+	            <el-button type="primary" size="small" link @click="preview_free(scope.row)">立即试看</el-button>
+	          </template>
+	        </el-table-column>
+	      </el-table>
+	      <el-empty v-else :image-size="60" description="暂无试看资源" />
+	    </el-card>
+	
+	    <!-- 复用之前的预览弹窗组件 (ResourceAudit.vue 里的那个) -->
+	    <el-dialog v-model="preview_visible" :title="`试看: ${current_res.resource_name}`" width="800px">
+	       <video v-if="current_res.resource_type === 1" :src="current_res.resource_url" controls style="width:100%"></video>
+	       <iframe v-else :src="current_res.resource_url" style="width: 100%; height: 500px; border: none;"></iframe>
+	    </el-dialog>
   </div>
   
 <!-- 预约下单对话框 -->
@@ -160,6 +191,23 @@ const order_rules = ref({
   ]
 })
 
+
+const free_resources = ref([])
+const preview_visible = ref(false)
+const current_res = ref({})
+
+// 在 load_detail 方法中顺便加载资料
+const load_free_resources = async () => {
+  const res = await request.get('/course_resource/list_by_course', { params: { course_id: route.query.course_id } })
+  // 过滤出：1.已通过(status=1) 2.免费(is_free=1)
+  free_resources.value = res.data.filter(item => item.status === 1 && item.is_free === 1)
+}
+
+const preview_free = (res) => {
+  current_res.value = res
+  preview_visible.value = true
+}
+
 // 学生：点击预约下单按钮 (保持不变，只是每次打开前清空一下旧数据)
 const handle_book = () => {
   order_form.value = { 
@@ -226,6 +274,7 @@ const handle_admin_modify = () => {
 
 onMounted(() => {
   load_detail()
+  load_free_resources()
 })
 </script>
 

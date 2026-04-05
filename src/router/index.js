@@ -128,7 +128,13 @@ const routes = [{
 			        name: 'ResourceAudit',
 			        component: () => import('../views/admin/ResourceAudit.vue'),
 			        meta: { title: '教学资料审核' }
-			      }
+			      },
+			{
+			  path: '/study-center',
+			  name: 'StudyCenter',
+			  component: () => import('../views/student/StudyCenter.vue'),
+			  meta: { title: '学习中心' }
+			}
 		]
 	}
 ]

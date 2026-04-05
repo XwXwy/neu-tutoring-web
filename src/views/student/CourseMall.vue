@@ -34,7 +34,14 @@
         <el-col :xs="24" :sm="12" :md="8" :lg="6" v-for="item in recommend_list" :key="item.id">
           <el-card :body-style="{ padding: '0px' }" class="course-card recommend-card" shadow="hover" @click="go_detail(item.id)">
             <div class="recommend-badge">推荐</div>
-            <img :src="item.cover_image || 'https://via.placeholder.com/300x200'" class="course-cover" />
+            <!-- 如果有封面图则显示图片 -->
+            <img v-if="item.cover_image" :src="item.cover_image" class="course-cover" />
+            
+            <!-- 如果没有封面图，显示一个漂亮的占位区域 -->
+            <div v-else class="no-cover-box">
+              <el-icon class="no-cover-icon"><Picture /></el-icon>
+              <div class="no-cover-text">该课程暂无封面</div>
+            </div>
             <div class="course-info">
               <h3 class="course-title">{{ item.title }}</h3>
               <div class="tutor-line">
@@ -57,7 +64,14 @@
     <el-row :gutter="20" class="course-grid" v-loading="loading">
       <el-col :xs="24" :sm="12" :md="8" :lg="6" v-for="item in course_list" :key="item.id">
         <el-card :body-style="{ padding: '0px' }" class="course-card" hover shadow="hover" @click="go_detail(item.id)">
-          <img :src="item.cover_image || 'https://via.placeholder.com/300x200?text=No+Cover'" class="course-cover" />
+          <!-- 如果有封面图则显示图片 -->
+          <img v-if="item.cover_image" :src="item.cover_image" class="course-cover" />
+          
+          <!-- 如果没有封面图，显示一个漂亮的占位区域 -->
+          <div v-else class="no-cover-box">
+            <el-icon class="no-cover-icon"><Picture /></el-icon>
+            <div class="no-cover-text">该课程暂无封面</div>
+          </div>
           <div class="course-info">
             <h3 class="course-title">{{ item.title }}</h3>
             <div class="tutor-line">
@@ -266,4 +280,27 @@ onMounted(() => {
 .price-unit { color: #999; font-size: 12px; flex: 1; }
 .book-btn { border-radius: 20px; padding: 8px 15px; }
 .pagination-box { display: flex; justify-content: center; margin-top: 30px; }
+
+/* 暂无封面的占位框样式 */
+.no-cover-box {
+  width: 100%;
+  height: 180px; /* 保持与图片高度一致 */
+  background-color: #f5f7fa;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #909399;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+}
+.no-cover-icon {
+  font-size: 40px;
+  margin-bottom: 8px;
+  opacity: 0.5;
+}
+.no-cover-text {
+  font-size: 14px;
+  letter-spacing: 1px;
+}
 </style>
