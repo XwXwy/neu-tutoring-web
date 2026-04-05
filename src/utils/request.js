@@ -3,7 +3,7 @@ import { ElMessage } from 'element-plus'
 
 const request = axios.create({
     baseURL: 'http://localhost:8080', 
-    timeout: 5000
+    timeout: 50000
 })
 
 // 请求拦截器：每次发请求前，把 localStorage 里的 Token 带上

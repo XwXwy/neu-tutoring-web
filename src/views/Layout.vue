@@ -40,6 +40,9 @@
 <el-menu-item v-if="user_info.role === 1" index="/course-publish">
   <el-icon><Reading /></el-icon><span>发布课程</span>
 </el-menu-item>
+        <el-menu-item v-if="user_info.role === 1" index="/tutor-course">
+          <el-icon><Management /></el-icon><span>我的课程</span>
+        </el-menu-item>
         <el-menu-item v-if="user_info.role === 1" index="/order-manage">
           <el-icon><List /></el-icon><span>订单管理</span>
         </el-menu-item>
@@ -49,6 +52,11 @@
 		          <el-icon><Ticket /></el-icon>
 		          <span>我的订单</span>
 		        </el-menu-item>
+				
+				        <el-menu-item v-if="user_info.role === 2" index="/ai-chat">
+				          <el-icon><ChatDotRound /></el-icon>
+				          <span>智能答疑</span>
+				        </el-menu-item>
 
 <!-- 选课中心：仅学生(2)和管理员(0)可见，家教(1)不可见 -->
         <el-menu-item v-if="user_info.role === 2 || user_info.role === 0" index="/course-mall">

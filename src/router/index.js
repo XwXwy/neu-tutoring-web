@@ -109,7 +109,20 @@ const routes = [{
 				meta: {
 					title: '退款纠纷处理'
 				}
-			}
+			},
+			
+			{
+			        path: '/ai-chat',
+			        name: 'AiChat',
+			        component: () => import('../views/student/AiChat.vue'),
+			        meta: { title: 'AI 智能答疑室' }
+			      },
+			{
+			        path: '/tutor-course',
+			        name: 'TutorCourse',
+			        component: () => import('../views/tutor/TutorCourse.vue'),
+			        meta: { title: '我的课程管理' }
+			      }
 		]
 	}
 ]

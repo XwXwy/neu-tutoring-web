@@ -78,24 +78,45 @@
     </el-card>
   </div>
   
-  <!-- 预约下单对话框 -->
-      <el-dialog v-model="book_dialog_visible" title="填写预约信息" width="500px">
-        <el-form :model="order_form" label-width="100px">
-          <el-form-item label="预约时间">
-            <el-input v-model="order_form.appoint_time" placeholder="如：每周六下午2点-4点" />
-          </el-form-item>
-          <el-form-item label="上课地址" v-if="course_info.type === 0">
-            <el-input v-model="order_form.address" placeholder="请填写详细上门地址" />
-          </el-form-item>
-          <el-form-item label="备注留言">
-            <el-input v-model="order_form.remark" type="textarea" placeholder="给老师说点什么吧..." />
-          </el-form-item>
-        </el-form>
-        <template #footer>
-          <el-button @click="book_dialog_visible = false">取消</el-button>
-          <el-button type="primary" @click="submit_order">提交预约</el-button>
-        </template>
-      </el-dialog>
+<!-- 预约下单对话框 -->
+    <el-dialog v-model="book_dialog_visible" title="填写预约信息" width="500px">
+      <!-- 1. 绑定 ref 用于校验，绑定 rules 定义规则 -->
+      <el-form ref="order_form_ref" :model="order_form" :rules="order_rules" label-width="100px">
+        
+        <!-- 2. 加上 prop 属性，对应 rules 里的字段名 -->
+        <el-form-item label="预约时间" prop="appoint_time">
+          <!-- 3. 使用日期时间选择器，限定格式 -->
+          <el-date-picker
+            v-model="order_form.appoint_time"
+            type="datetime"
+            placeholder="请选择期望的首次上课时间"
+            format="YYYY-MM-DD HH:mm"
+            value-format="YYYY-MM-DD HH:mm"
+            :disabled-date="disabled_date"
+            style="width: 100%"
+          />
+        </el-form-item>
+        
+        <el-form-item label="上课地址" prop="address" v-if="course_info.type === 0">
+          <el-input v-model="order_form.address" placeholder="请填写详细上门地址（如：xx小区x栋x号）" />
+        </el-form-item>
+        
+        <el-form-item label="备注留言" prop="remark">
+          <el-input 
+            v-model="order_form.remark" 
+            type="textarea" 
+            :rows="3" 
+            maxlength="200" 
+            show-word-limit
+            placeholder="给老师说点什么吧...(最多200字)" 
+          />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="book_dialog_visible = false">取消</el-button>
+        <el-button type="primary" @click="submit_order">提交预约</el-button>
+      </template>
+    </el-dialog>
   
 </template>
 
@@ -120,31 +141,57 @@ const order_form = ref({
   remark: ''
 })
 
+// 【新增 1】表单的 DOM 引用
+const order_form_ref = ref(null)
 
-// 学生：点击预约下单按钮
-const handle_book = () => {
-  order_form.value = { course_id: course_info.value.id } // 把课程ID带上
-  book_dialog_visible.value = true
+// 【新增 2】禁用今天之前的日期（不能预约过去的时间）
+const disabled_date = (time) => {
+  return time.getTime() < Date.now() - 8.64e7 // 减去一天的毫秒数，表示只能选今天及以后
 }
 
+// 【新增 3】定义表单校验规则
+const order_rules = ref({
+  appoint_time:[
+    { required: true, message: '请选择预约上课时间', trigger: 'change' }
+  ],
+  address:[
+    { required: true, message: '线下课程必须填写上门地址', trigger: 'blur' },
+    { min: 5, max: 100, message: '地址长度需在 5 到 100 个字符之间', trigger: 'blur' }
+  ]
+})
 
-// 提交订单
-const submit_order = async () => {
-  // 简单校验
-  if (!order_form.value.appoint_time) {
-    ElMessage.warning('请填写期望的预约时间')
-    return
+// 学生：点击预约下单按钮 (保持不变，只是每次打开前清空一下旧数据)
+const handle_book = () => {
+  order_form.value = { 
+    course_id: course_info.value.id,
+    appoint_time: '',
+    address: '',
+    remark: ''
+  } 
+  book_dialog_visible.value = true
+  // 移除上一次的校验红字提示
+  if (order_form_ref.value) {
+    order_form_ref.value.clearValidate()
   }
-  if (course_info.value.type === 0 && !order_form.value.address) {
-    ElMessage.warning('线下课程请填写上课地址')
-    return
-  }
+}
 
-  try {
-    await request.post('/order/create', order_form.value)
-    ElMessage.success('预约请求已发送，请到“我的订单”中查看状态')
-    book_dialog_visible.value = false
-  } catch(error) {}
+// 【修改】提交订单（加入校验拦截）
+const submit_order = () => {
+  // 调用 Element Plus 的表单校验方法
+  order_form_ref.value.validate(async (valid) => {
+    if (valid) {
+      // 校验通过，发请求
+      try {
+        await request.post('/order/create', order_form.value)
+        ElMessage.success('预约请求已发送，请到“我的订单”中查看状态')
+        book_dialog_visible.value = false
+      } catch(error) {}
+    } else {
+      // 校验不通过
+      ElMessage.warning('请检查输入信息是否正确完整')
+      return false
+    }
+  })
 }
 
 // 加载课程详情
