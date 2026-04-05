@@ -122,6 +122,12 @@ const routes = [{
 			        name: 'TutorCourse',
 			        component: () => import('../views/tutor/TutorCourse.vue'),
 			        meta: { title: '我的课程管理' }
+			      },
+			{
+			        path: '/resource-audit',
+			        name: 'ResourceAudit',
+			        component: () => import('../views/admin/ResourceAudit.vue'),
+			        meta: { title: '教学资料审核' }
 			      }
 		]
 	}

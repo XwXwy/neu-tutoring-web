@@ -22,11 +22,25 @@
             <el-tag v-if="scope.row.status === 2" type="warning">审核中</el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="200" fixed="right">
+<el-table-column label="操作" width="280" fixed="right">
           <template #default="scope">
-            <!-- 【核心按钮】点击打开资料管理抽屉 -->
-            <el-button type="primary" size="small" @click="open_resource_drawer(scope.row)">
+            <!-- 资料管理：只有在非下架(status!=0)状态下才可用 -->
+            <el-button 
+              type="primary" 
+              size="small" 
+              :disabled="scope.row.status === 0"
+              @click="open_resource_drawer(scope.row)">
               <el-icon><FolderOpened /></el-icon> 资料管理
+            </el-button>
+            
+            <!-- 编辑课程 -->
+            <el-button type="warning" size="small" @click="open_edit_dialog(scope.row)">
+              <el-icon><Edit /></el-icon> 编辑
+            </el-button>
+            
+            <!-- 删除课程 -->
+            <el-button type="danger" size="small" @click="delete_course(scope.row.id)">
+              <el-icon><Delete /></el-icon> 删除
             </el-button>
           </template>
         </el-table-column>
@@ -108,6 +122,63 @@
       </el-table>
 
     </el-drawer>
+	
+	
+	
+	<!-- 编辑课程对话框 -->
+	    <el-dialog v-model="edit_dialog_visible" title="编辑课程信息" width="600px">
+	      <el-form :model="edit_form" label-width="120px">
+	        <el-form-item label="课程标题">
+	          <el-input v-model="edit_form.title" />
+	        </el-form-item>
+	        <el-row :gutter="20">
+	          <el-col :span="12">
+	            <el-form-item label="课程科目">
+	              <el-select v-model="edit_form.category_id" style="width:100%">
+	                <el-option label="数学" :value="1" />
+	                <el-option label="英语" :value="2" />
+	                <el-option label="物理" :value="3" />
+	              </el-select>
+	            </el-form-item>
+	          </el-col>
+	          <el-col :span="12">
+	            <el-form-item label="价格(元/课时)">
+	              <el-input-number v-model="edit_form.price" :precision="2" :min="0" style="width:100%" />
+	            </el-form-item>
+	          </el-col>
+	        </el-row>
+	        <el-form-item label="授课方式">
+	          <el-radio-group v-model="edit_form.type">
+	            <el-radio :label="0">线下上门</el-radio>
+	            <el-radio :label="1">在线视频课</el-radio>
+	          </el-radio-group>
+	        </el-form-item>
+<el-form-item label="课程封面图">
+          <el-upload
+            class="cover-uploader"
+            action="http://localhost:8080/file/upload"
+            :show-file-list="false"
+            :on-success="handle_edit_cover_success"
+          >
+            <img v-if="edit_form.cover_image" :src="edit_form.cover_image" class="cover-img" />
+            <!-- 【核心修复】增加一个占位区块，包含图标和文字 -->
+            <div v-else class="upload-placeholder">
+              <el-icon><Picture /></el-icon>
+              <span>点击上传封面</span>
+            </div>
+          </el-upload>
+        </el-form-item>
+	        <el-form-item label="课程详情介绍">
+	          <el-input v-model="edit_form.description" type="textarea" :rows="5" />
+	        </el-form-item>
+	      </el-form>
+	      <template #footer>
+	        <el-button @click="edit_dialog_visible = false">取消</el-button>
+	        <el-button type="primary" @click="submit_edit">提交修改</el-button>
+	      </template>
+	    </el-dialog>
+	
+	
   </div>
 </template>
 
@@ -119,6 +190,40 @@ import { FolderOpened, Upload, Check } from '@element-plus/icons-vue'
 
 const loading = ref(true)
 const course_list = ref([])
+const edit_dialog_visible = ref(false)
+const edit_form = ref({})
+
+const open_edit_dialog = (course) => {
+  // 深拷贝一份数据，防止修改弹窗时表格数据也跟着变
+  edit_form.value = JSON.parse(JSON.stringify(course))
+  edit_dialog_visible.value = true
+}
+
+const handle_edit_cover_success = (res) => {
+  if (res.code === 200) {
+    edit_form.value.cover_image = res.data
+  }
+}
+
+const submit_edit = async () => {
+  await request.post('/course/tutor/update', edit_form.value)
+  ElMessage.success('课程已提交更新，请等待管理员重新审核')
+  edit_dialog_visible.value = false
+  get_course_list()
+}
+
+// --- 删除课程 ---
+const delete_course = (course_id) => {
+  ElMessageBox.confirm(
+    '确定要删除这门课程吗？所有关联的教学资料也将失效！',
+    '危险操作警告',
+    { type: 'warning' }
+  ).then(async () => {
+    await request.delete(`/course/tutor/delete/${course_id}`)
+    ElMessage.success('课程删除成功')
+    get_course_list()
+  })
+}
 
 // 获取家教自己的课程列表
 const get_course_list = async () => {
@@ -242,3 +347,43 @@ onMounted(() => {
 })
 
 </script>
+
+<style scoped>
+	
+	/* 美化上传框，定宽高、加虚线 */
+	.cover-uploader :deep(.el-upload) {
+	  border: 1px dashed #d9d9d9;
+	  border-radius: 6px;
+	  cursor: pointer;
+	  position: relative;
+	  overflow: hidden;
+	  width: 178px;
+	  height: 178px;
+	  background-color: #fafafa;
+	  transition: border-color 0.3s;
+	}
+	.cover-uploader :deep(.el-upload:hover) {
+	  border-color: #409EFF;
+	}
+	.cover-img {
+	  width: 178px;
+	  height: 178px;
+	  object-fit: cover;
+	  display: block;
+	}
+	/* 占位区居中对齐 */
+	.upload-placeholder {
+	  display: flex;
+	  flex-direction: column;
+	  align-items: center;
+	  justify-content: center;
+	  width: 100%;
+	  height: 100%;
+	  color: #8c939d;
+	}
+	.upload-placeholder .el-icon {
+	  font-size: 28px;
+	  margin-bottom: 10px;
+	}
+	
+</style>

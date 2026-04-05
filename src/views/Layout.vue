@@ -25,6 +25,10 @@
   <el-menu-item index="/user-manage"><el-icon><Search /></el-icon>用户管理</el-menu-item>
   <el-menu-item index="/tutor-audit"><el-icon><DocumentChecked /></el-icon>资质审核</el-menu-item>
   <el-menu-item index="/course-audit"><el-icon><DocumentChecked /></el-icon>课程审核</el-menu-item>
+            <el-menu-item index="/resource-audit">
+              <el-icon><VideoPlay /></el-icon>
+              教学资料审核
+            </el-menu-item>
 </el-sub-menu>
 
 <el-sub-menu v-if="user_info.role === 0" index="/management">
