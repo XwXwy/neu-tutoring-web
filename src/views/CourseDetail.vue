@@ -26,10 +26,10 @@
             <span class="unit"> / 课时</span>
           </div>
 
-          <div class="tutor-card">
+          <div class="tutor-card" style="cursor: pointer;" @click="go_tutor_profile(course_info.tutor_id)">
             <el-avatar :size="50" :src="course_info.tutor_avatar" />
             <div class="tutor-info">
-              <div class="name">{{ course_info.tutor_name }} 老师</div>
+              <div class="name">{{ course_info.tutor_name }} 老师 <el-icon><ArrowRight /></el-icon></div>
               <div class="city"><el-icon><Location /></el-icon> {{ course_info.city }}</div>
             </div>
           </div>
@@ -107,6 +107,65 @@
 	       <video v-if="current_res.resource_type === 1" :src="current_res.resource_url" controls style="width:100%"></video>
 	       <iframe v-else :src="current_res.resource_url" style="width: 100%; height: 500px; border: none;"></iframe>
 	    </el-dialog>
+		
+		
+		<!-- 新增：课程专属评价列表 -->
+		    <el-card shadow="never" class="desc-card" style="margin-top: 20px;">
+		      <template #header>
+		        <div class="card-header">
+		          <span><el-icon><ChatSquare /></el-icon> 课程评价 ({{ comment_list.length }}条)</span>
+		        </div>
+		      </template>
+		      <el-empty v-if="comment_list.length === 0" description="该课程暂无评价" />
+		      <div v-else class="comment-list">
+		        <!-- 样式复用了，和 TutorProfile 基本一致 -->
+		        <div v-for="item in comment_list" :key="item.id" style="display: flex; padding: 15px 0; border-bottom: 1px solid #ebeef5;">
+		          <el-avatar :size="40" :src="item.student_avatar" />
+		          <div style="margin-left: 15px; flex: 1;">
+		            <div style="margin-bottom: 5px; display: flex; align-items: center;">
+		              <span style="font-weight: bold; font-size: 14px; margin-right: auto;">{{ item.student_name }}</span>
+		              <span style="font-size: 12px; color: #909399;">{{ item.create_time }}</span>
+		            </div>
+		            <el-rate v-model="item.score" disabled size="small" />
+		            <div style="font-size: 14px; color: #606266; margin-top: 8px;">{{ item.content }}</div>
+		            <div style="margin-top: 5px; text-align: right;">
+		                          <div style="margin-top: 5px; text-align: right;">
+		                            <el-button 
+		                              link 
+		                              type="danger" 
+		                              size="small" 
+		                              :disabled="item.user_id === user_info.id" 
+		                              @click="open_report_dialog(item.id)"
+		                            >
+		                              {{ item.user_id === user_info.id ? '我的评价' : '举报' }}
+		                            </el-button>
+		                          </div>
+		            </div>
+		          </div>
+		        </div>
+		      </div>
+		    </el-card>
+		
+		    <!-- 举报弹窗 (和 TutorProfile 一模一样，你可以直接复制过来) -->
+		    <el-dialog v-model="report_dialog_visible" title="举报违规评价" width="400px">
+		      <el-form label-position="top">
+		        <el-form-item label="请选择或填写举报理由：" required>
+		          <el-radio-group v-model="report_reason" style="margin-bottom: 10px; display: flex; flex-direction: column; align-items: flex-start;">
+		            <el-radio label="恶意攻击/辱骂老师">恶意攻击/辱骂老师</el-radio>
+		            <el-radio label="虚假交易/刷单评价">虚假交易/刷单评价</el-radio>
+		            <el-radio label="包含广告或违规信息">包含广告或违规信息</el-radio>
+		            <el-radio label="其他">其他原因</el-radio>
+		          </el-radio-group>
+		          <el-input v-if="report_reason === '其他'" v-model="custom_reason" placeholder="请详细说明..." type="textarea" />
+		        </el-form-item>
+		      </el-form>
+		      <template #footer>
+		        <el-button @click="report_dialog_visible = false">取消</el-button>
+		        <el-button type="primary" @click="submit_report">提交举报</el-button>
+		      </template>
+		    </el-dialog>
+		
+		
   </div>
   
 <!-- 预约下单对话框 -->
@@ -171,6 +230,56 @@ const order_form = ref({
   address: '',
   remark: ''
 })
+
+// 【追加】评论列表相关
+const comment_list = ref([])
+
+// 【追加】举报弹窗相关
+const report_dialog_visible = ref(false)
+const current_comment_id = ref(null)
+const report_reason = ref('恶意攻击/辱骂老师')
+const custom_reason = ref('')
+
+// 【追加】加载本课程专属的评论
+const load_course_comments = async () => {
+  const course_id = route.query.course_id
+  if (!course_id) return
+  try {
+    const res = await request.get('/comment/course_list', { params: { course_id } })
+    comment_list.value = res.data
+  } catch(error) {}
+}
+
+// 【追加】跳转到家教个人主页
+const go_tutor_profile = (tutor_id) => {
+  router.push({ path: '/tutor-profile', query: { tutor_id } })
+}
+
+// 【追加】打开举报弹窗
+const open_report_dialog = (comment_id) => {
+  current_comment_id.value = comment_id
+  report_reason.value = '恶意攻击/辱骂老师'
+  custom_reason.value = ''
+  report_dialog_visible.value = true
+}
+
+// 【追加】提交举报
+const submit_report = async () => {
+  const final_reason = report_reason.value === '其他' ? custom_reason.value : report_reason.value
+  if (!final_reason.trim()) {
+    ElMessage.warning('请提供举报理由')
+    return
+  }
+  
+  try {
+    await request.post('/comment/report', null, {
+      params: { comment_id: current_comment_id.value, reason: final_reason }
+    })
+    ElMessage.success('举报已提交，平台将尽快核实处理')
+    report_dialog_visible.value = false
+  } catch (error) {}
+}
+
 
 // 【新增 1】表单的 DOM 引用
 const order_form_ref = ref(null)
@@ -275,6 +384,7 @@ const handle_admin_modify = () => {
 onMounted(() => {
   load_detail()
   load_free_resources()
+  load_course_comments()
 })
 </script>
 

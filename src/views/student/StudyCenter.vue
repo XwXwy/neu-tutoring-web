@@ -17,7 +17,7 @@
             
             <div class="progress-box">
               <div class="label">学习进度：{{ item.progress }}%</div>
-              <el-progress :percentage="item.progress" :format="() => ''" />
+              <el-progress :percentage="item.progress" :show-text="false" :stroke-width="10" />
             </div>
             
             <el-button type="success" size="small" style="width: 100%; margin-top: 10px;">
@@ -44,8 +44,8 @@ const load_data = async () => {
 }
 
 const go_study = (id) => {
-  // 点击跳转到具体的课程学习室页面（我们下一步要做这个）
-  router.push({ path: '/study_room', query: { course_id: id } })
+  // 点击跳转到具体的课程学习室页面
+  router.push({ path: '/study-room', query: { course_id: id } })
 }
 
 onMounted(load_data)

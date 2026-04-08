@@ -75,7 +75,7 @@ const routes = [{
 				name: 'CourseMall',
 				component: () => import('../views/student/CourseMall.vue'),
 				meta: {
-					title: '找家教&选课中心'
+					title: '选课中心'
 				}
 			},
 			{
@@ -83,7 +83,11 @@ const routes = [{
 				name: 'CourseDetail',
 				component: () => import('../views/CourseDetail.vue'),
 				meta: {
-					title: '课程详情'
+					title: '课程详情',
+					parent: {
+						path: '/course-mall',
+						title: '选课中心'
+					}
 				}
 			},
 			{
@@ -110,31 +114,63 @@ const routes = [{
 					title: '退款纠纷处理'
 				}
 			},
-			
+
 			{
-			        path: '/ai-chat',
-			        name: 'AiChat',
-			        component: () => import('../views/student/AiChat.vue'),
-			        meta: { title: 'AI 智能答疑室' }
+				path: '/ai-chat',
+				name: 'AiChat',
+				component: () => import('../views/student/AiChat.vue'),
+				meta: {
+					title: 'AI 智能答疑室'
+				}
+			},
+			{
+				path: '/tutor-course',
+				name: 'TutorCourse',
+				component: () => import('../views/tutor/TutorCourse.vue'),
+				meta: {
+					title: '我的课程管理'
+				}
+			},
+			{
+				path: '/resource-audit',
+				name: 'ResourceAudit',
+				component: () => import('../views/admin/ResourceAudit.vue'),
+				meta: {
+					title: '教学资料审核'
+				}
+			},
+			{
+				path: '/study-center',
+				name: 'StudyCenter',
+				component: () => import('../views/student/StudyCenter.vue'),
+				meta: {
+					title: '学习中心'
+				}
+			},
+			{
+				path: '/study-room',
+				name: 'StudyRoom',
+				component: () => import('../views/student/StudyRoom.vue'),
+				meta: {
+					title: '学习室',
+					parent: {
+						path: '/study-center',
+						title: '学习中心'
+					}
+				}
+			},
+			      {
+			        path: '/tutor-profile',
+			        name: 'TutorProfile',
+			        component: () => import('../views/TutorProfile.vue'),
+			        meta: { title: '家教个人主页', parent: { path: '/course-mall', title: '选课中心' } }
 			      },
-			{
-			        path: '/tutor-course',
-			        name: 'TutorCourse',
-			        component: () => import('../views/tutor/TutorCourse.vue'),
-			        meta: { title: '我的课程管理' }
-			      },
-			{
-			        path: '/resource-audit',
-			        name: 'ResourceAudit',
-			        component: () => import('../views/admin/ResourceAudit.vue'),
-			        meta: { title: '教学资料审核' }
-			      },
-			{
-			  path: '/study-center',
-			  name: 'StudyCenter',
-			  component: () => import('../views/student/StudyCenter.vue'),
-			  meta: { title: '学习中心' }
-			}
+				  {
+				          path: '/comment-audit',
+				          name: 'CommentAudit',
+				          component: () => import('../views/admin/CommentAudit.vue'),
+				          meta: { title: '用户评价审核' }
+				        }
 		]
 	}
 ]

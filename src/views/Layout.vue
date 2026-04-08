@@ -33,7 +33,10 @@
 
 <el-sub-menu v-if="user_info.role === 0" index="/management">
 	<template #title><el-icon><Service /></el-icon><span>纠纷管理</span></template>
-          <!-- ... 其他菜单 ... -->
+                    <el-menu-item index="/comment-audit">
+                      <el-icon><Filter /></el-icon>
+                      评价与举报审核
+                    </el-menu-item>
           <el-menu-item index="/order-dispute">
             <el-icon><WarningFilled /></el-icon>
             退款纠纷处理
@@ -87,8 +90,20 @@
       <el-header style="display: flex; align-items: center; justify-content: space-between;">
         <div class="toolbar">
           <el-icon @click="is_collapse = !is_collapse" class="collapse-icon"><Menu /></el-icon>
+<!-- 动态多级面包屑 -->
           <el-breadcrumb separator="/">
+             <!-- 第一级：固定为首页 -->
              <el-breadcrumb-item :to="{ path: '/dashboard' }">首页</el-breadcrumb-item>
+             
+             <!-- 第二级：判断当前路由有没有配置 parent，如果有就显示并加上链接 -->
+             <el-breadcrumb-item 
+               v-if="$route.meta.parent" 
+               :to="{ path: $route.meta.parent.path }"
+             >
+               {{ $route.meta.parent.title }}
+             </el-breadcrumb-item>
+
+             <!-- 第三级：当前所在的页面 -->
              <el-breadcrumb-item>{{ $route.meta.title || '详情页' }}</el-breadcrumb-item>
           </el-breadcrumb>
         </div>
