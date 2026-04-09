@@ -23,6 +23,10 @@
 <el-sub-menu v-if="user_info.role === 0" index="/admin">
   <template #title><el-icon><Setting /></el-icon><span>系统管理</span></template>
   <el-menu-item index="/user-manage"><el-icon><Search /></el-icon>用户管理</el-menu-item>
+            <el-menu-item index="/notice-manage">
+              <el-icon><Notification /></el-icon>
+              公告发布管理
+            </el-menu-item>
   <el-menu-item index="/tutor-audit"><el-icon><DocumentChecked /></el-icon>资质审核</el-menu-item>
   <el-menu-item index="/course-audit"><el-icon><DocumentChecked /></el-icon>课程审核</el-menu-item>
             <el-menu-item index="/resource-audit">

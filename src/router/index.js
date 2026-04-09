@@ -159,17 +159,45 @@ const routes = [{
 					}
 				}
 			},
-			      {
-			        path: '/tutor-profile',
-			        name: 'TutorProfile',
-			        component: () => import('../views/TutorProfile.vue'),
-			        meta: { title: '家教个人主页', parent: { path: '/course-mall', title: '选课中心' } }
+			{
+				path: '/tutor-profile',
+				name: 'TutorProfile',
+				component: () => import('../views/TutorProfile.vue'),
+				meta: {
+					title: '家教个人主页',
+					parent: {
+						path: '/course-mall',
+						title: '选课中心'
+					}
+				}
+			},
+			{
+				path: '/comment-audit',
+				name: 'CommentAudit',
+				component: () => import('../views/admin/CommentAudit.vue'),
+				meta: {
+					title: '用户评价审核'
+				}
+			},
+			{
+				path: '/notice-manage',
+				name: 'NoticeManage',
+				component: () => import('../views/admin/NoticeManage.vue'),
+				meta: {
+					title: '公告发布与管理'
+				}
+			},
+			{
+			        path: '/notice-detail',
+			        name: 'NoticeDetail',
+			        component: () => import('../views/NoticeDetail.vue'),
+			        meta: { title: '公告详情' }
 			      },
 				  {
-				          path: '/comment-audit',
-				          name: 'CommentAudit',
-				          component: () => import('../views/admin/CommentAudit.vue'),
-				          meta: { title: '用户评价审核' }
+				          path: '/notice-list',
+				          name: 'NoticeList',
+				          component: () => import('../views/NoticeList.vue'),
+				          meta: { title: '平台公告列表', parent: { path: '/dashboard', title: '首页看板' } }
 				        }
 		]
 	}

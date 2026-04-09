@@ -58,16 +58,24 @@
       </el-col>
 
       <!-- 右侧：系统公告 -->
-      <el-col :xs="24" :md="8">
-        <el-card shadow="never" class="notice-card">
-          <template #header>
-            <div class="card-header">
-              <span style="font-weight: bold; color: #E6A23C;"><el-icon><BellFilled /></el-icon> 最新系统公告</span>
-            </div>
-          </template>
-          
-          <div v-if="notice_list.length > 0" class="notice-list">
-            <div v-for="item in notice_list" :key="item.id" class="notice-item">
+          <el-col :xs="24" :md="8">
+            <el-card shadow="never" class="notice-card">
+              <template #header>
+                <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                  <span style="font-weight: bold; color: #E6A23C;"><el-icon><BellFilled /></el-icon> 最新系统公告</span>
+                  <!-- 【新增】查看全部按钮 -->
+                  <el-button link type="primary" @click="router.push('/notice-list')">全部公告</el-button>
+                </div>
+              </template>
+              
+              <div v-if="notice_list.length > 0" class="notice-list">
+                <!-- 【修改】给每个 item 加上点击事件 -->
+                <div 
+                  v-for="item in notice_list" 
+                  :key="item.id" 
+                  class="notice-item" 
+                  @click="go_to_notice_detail(item.id)"
+                >
               <div class="notice-title">
                 <el-tag size="small" :type="item.type === 0 ? 'danger' : (item.type === 1 ? 'warning' : 'primary')" class="notice-tag">
                   {{ item.type === 0 ? '系统' : (item.type === 1 ? '活动' : '政策') }}
@@ -99,7 +107,13 @@ const notice_list = ref([])
 // 获取图表 DOM 容器的引用
 const chart_ref = ref(null)
 let my_chart = null
+import { useRouter } from 'vue-router'
+const router = useRouter()
 
+// 跳转到公告详情页的方法
+const go_to_notice_detail = (id) => {
+  router.push({ path: '/notice-detail', query: { id } })
+}
 // 加载看板数据
 const load_dashboard_data = async () => {
   try {
@@ -234,12 +248,20 @@ onUnmounted(() => {
   height: 430px;
   overflow-y: auto;
 }
+/* 修改公告列表样式，增加悬停效果 */
 .notice-item {
-  padding: 15px 0;
+  padding: 12px 15px;
   border-bottom: 1px dashed #ebeef5;
+  cursor: pointer;
+  transition: all 0.3s ease; /* 平滑过渡 */
+  border-radius: 6px;
 }
 .notice-item:last-child {
   border-bottom: none;
+}
+.notice-item:hover {
+  background-color: #f5f7fa; /* 悬停时背景变灰 */
+  transform: translateX(8px); /* 悬停时整体向右微微滑动，交互感极强 */
 }
 .notice-title {
   font-size: 15px;
@@ -248,6 +270,10 @@ onUnmounted(() => {
   margin-bottom: 8px;
   display: flex;
   align-items: center;
+  transition: color 0.3s;
+}
+.notice-item:hover .title-text {
+  color: #409EFF; /* 悬停时标题文字变蓝 */
 }
 .notice-tag {
   margin-right: 8px;
