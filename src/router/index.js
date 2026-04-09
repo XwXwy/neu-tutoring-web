@@ -188,23 +188,39 @@ const routes = [{
 				}
 			},
 			{
-			        path: '/notice-detail',
-			        name: 'NoticeDetail',
-			        component: () => import('../views/NoticeDetail.vue'),
-			        meta: { title: '公告详情' }
-			      },
-				  {
-				          path: '/notice-list',
-				          name: 'NoticeList',
-				          component: () => import('../views/NoticeList.vue'),
-				          meta: { title: '平台公告列表', parent: { path: '/dashboard', title: '首页看板' } }
-				        },
-						{
-						        path: '/feedback-manage',
-						        name: 'FeedbackManage',
-						        component: () => import('../views/admin/FeedbackManage.vue'),
-						        meta: { title: '意见反馈处理' }
-						      }
+				path: '/notice-detail',
+				name: 'NoticeDetail',
+				component: () => import('../views/NoticeDetail.vue'),
+				meta: {
+					title: '公告详情'
+				}
+			},
+			{
+				path: '/notice-list',
+				name: 'NoticeList',
+				component: () => import('../views/NoticeList.vue'),
+				meta: {
+					title: '平台公告列表',
+					parent: {
+						path: '/dashboard',
+						title: '首页看板'
+					}
+				}
+			},
+			{
+				path: '/feedback-manage',
+				name: 'FeedbackManage',
+				component: () => import('../views/admin/FeedbackManage.vue'),
+				meta: {
+					title: '意见反馈处理'
+				}
+			},
+			{
+			        path: '/tutor-wallet',
+			        name: 'TutorWallet',
+			        component: () => import('../views/tutor/TutorWallet.vue'),
+			        meta: { title: '我的钱包与报表' }
+			      }
 		]
 	}
 ]

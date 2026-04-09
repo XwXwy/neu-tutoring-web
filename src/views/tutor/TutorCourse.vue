@@ -6,7 +6,14 @@
       </template>
 
       <el-table :data="course_list" v-loading="loading">
-        <el-table-column prop="title" label="课程标题" />
+        <el-table-column label="课程标题" min-width="180">
+                  <template #default="scope">
+                    <!-- 增加悬停点击样式 -->
+                    <span class="clickable-title" @click="go_to_detail(scope.row.id)">
+                      {{ scope.row.title }}
+                    </span>
+                  </template>
+                </el-table-column>
         <el-table-column prop="price" label="价格" width="100" />
         <el-table-column prop="type" label="类型" width="100">
           <template #default="scope">
@@ -187,7 +194,13 @@ import { ref, onMounted } from 'vue'
 import request from '../../utils/request'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { FolderOpened, Upload, Check } from '@element-plus/icons-vue'
+import { useRouter } from 'vue-router'
 
+
+const router = useRouter()
+const go_to_detail = (course_id) => {
+  router.push({ path: '/course-detail', query: { course_id } })
+}
 const loading = ref(true)
 const course_list = ref([])
 const edit_dialog_visible = ref(false)
@@ -385,5 +398,16 @@ onMounted(() => {
 	  font-size: 28px;
 	  margin-bottom: 10px;
 	}
-	
+	/* 课程标题悬停交互样式 */
+	.clickable-title {
+	  color: #303133;
+	  font-weight: 500;
+	  cursor: pointer;
+	  transition: all 0.3s ease;
+	}
+	.clickable-title:hover {
+	  color: #409EFF;
+	  text-decoration: underline;
+	  text-underline-offset: 2px; 
+	}
 </style>

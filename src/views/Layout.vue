@@ -62,7 +62,9 @@
         <el-menu-item v-if="user_info.role === 1" index="/order-manage">
           <el-icon><List /></el-icon><span>订单管理</span>
         </el-menu-item>
-		
+		<el-menu-item v-if="user_info.role === 1" index="/tutor-wallet">
+		          <el-icon><Money /></el-icon><span>财务管理</span>
+		        </el-menu-item>
 		<!-- 仅学生(role=2)可见的菜单 -->
 		        <el-menu-item v-if="user_info.role === 2" index="/student-order">
 		          <el-icon><Ticket /></el-icon>
