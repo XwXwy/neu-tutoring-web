@@ -198,7 +198,13 @@ const routes = [{
 				          name: 'NoticeList',
 				          component: () => import('../views/NoticeList.vue'),
 				          meta: { title: '平台公告列表', parent: { path: '/dashboard', title: '首页看板' } }
-				        }
+				        },
+						{
+						        path: '/feedback-manage',
+						        name: 'FeedbackManage',
+						        component: () => import('../views/admin/FeedbackManage.vue'),
+						        meta: { title: '意见反馈处理' }
+						      }
 		]
 	}
 ]

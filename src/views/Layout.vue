@@ -10,6 +10,7 @@
         active-text-color="#409EFF"
         background-color="#001529"
         text-color="#ffffffb3"
+		
         :default-active="$route.path"
         :collapse="is_collapse"
         :router="true"
@@ -33,6 +34,10 @@
               <el-icon><VideoPlay /></el-icon>
               教学资料审核
             </el-menu-item>
+			<el-menu-item index="/feedback-manage">
+			            <el-icon><Service /></el-icon>
+			            意见反馈处理
+			          </el-menu-item>
 </el-sub-menu>
 
 <el-sub-menu v-if="user_info.role === 0" index="/management">
@@ -83,6 +88,11 @@
 		  <span>智能答疑</span>
 		</el-menu-item>
 
+        <div style="flex-grow: 1;"></div> <!-- 占位推手 -->
+        <el-menu-item v-if="user_info.role === 2 || user_info.role === 1" @click="open_feedback_dialog" style="border-top: 1px solid #1f2d3d;">
+          <el-icon><Microphone /></el-icon>
+          <span>意见反馈</span>
+        </el-menu-item>
       </el-menu>
     </el-aside>
 	
@@ -135,16 +145,119 @@
         </el-scrollbar>
       </el-main>
     </el-container>
+	
+	
+<!-- 全局反馈弹窗 (增加了历史记录查看功能) -->
+    <el-dialog v-model="feedback_dialog_visible" title="💡 意见与建议反馈" width="550px">
+      <!-- 提交新反馈区域 -->
+      <el-form label-position="top">
+        <el-form-item label="您遇到了什么问题？或有什么好建议？" required>
+          <el-input 
+            v-model="feedback_content" 
+            type="textarea" 
+            :rows="4" 
+            maxlength="500" 
+            show-word-limit
+            placeholder="请详细描述，以便我们更好地为您服务..." 
+          />
+        </el-form-item>
+        <div style="text-align: right;">
+          <el-button type="primary" :loading="submitting_feedback" @click="submit_feedback">提交反馈</el-button>
+        </div>
+      </el-form>
+
+      <el-divider border-style="dashed" />
+
+      <!-- 【极简体验】历史反馈查看区域 -->
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+        <span style="font-weight: bold; color: #606266;">我的历史反馈</span>
+        <el-button size="small" round @click="load_my_feedbacks">刷新记录</el-button>
+      </div>
+
+      <el-empty v-if="my_feedback_list.length === 0" description="您还没有提交过反馈" :image-size="60" />
+      
+      <!-- 用时间线来展示极其直观 -->
+      <el-timeline v-else style="padding-left: 0; max-height: 250px; overflow-y: auto;">
+        <el-timeline-item 
+          v-for="item in my_feedback_list" 
+          :key="item.id" 
+          :timestamp="item.create_time" 
+          :type="item.status === 1 ? 'success' : 'info'"
+        >
+          <div style="font-size: 13px; color: #303133; margin-bottom: 5px;">
+            <strong>我：</strong>{{ item.content }}
+          </div>
+          <!-- 平台回复展示 -->
+          <div v-if="item.status === 1" style="font-size: 13px; color: #67C23A; background: #f0f9eb; padding: 8px; border-radius: 4px;">
+            <strong>平台回复：</strong>{{ item.reply }}
+          </div>
+          <div v-else style="font-size: 12px; color: #E6A23C;">
+            平台管理员正在赶来处理的路上...
+          </div>
+        </el-timeline-item>
+      </el-timeline>
+
+    </el-dialog>
+	
+	
   </el-container>
+  
+  
+  
 </template>
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
+import request from '../utils/request'
+import { ElMessage } from 'element-plus'
 
 const is_collapse = ref(false)
 const router = useRouter()
 const user_info = ref({})
+const feedback_dialog_visible = ref(false)
+const feedback_content = ref('')
+const submitting_feedback = ref(false)
+
+// 用于存放“我的历史反馈”的数组
+const my_feedback_list = ref([])
+
+// 加载“我的历史反馈”的方法
+const load_my_feedbacks = async () => {
+  try {
+    const res = await request.get('/feedback/my_list')
+    my_feedback_list.value = res.data
+  } catch(error) {
+    console.error("加载历史反馈失败:", error)
+  }
+}
+
+// 打开反馈弹窗时，不仅要清空输入框，还要自动加载一次历史记录
+const open_feedback_dialog = () => {
+  feedback_content.value = ''
+  feedback_dialog_visible.value = true
+  load_my_feedbacks() // 【追加】自动加载
+}
+
+// 提交新反馈成功后，也要刷新一次历史记录
+const submit_feedback = async () => {
+  if (!feedback_content.value.trim()) {
+    ElMessage.warning('反馈内容不能为空')
+    return
+  }
+  
+  submitting_feedback.value = true
+  try {
+    await request.post('/feedback/submit', { content: feedback_content.value })
+    ElMessage.success('反馈已提交，感谢您的支持！')
+    load_my_feedbacks() // 【追加】提交成功后刷新
+    feedback_content.value = '' // 清空输入框
+  } catch (error) {
+    console.error('反馈提交失败:', error)
+  } finally {
+    submitting_feedback.value = false
+  }
+}
 
 // 专门抽取一个方法来加载本地存储的信息
 const load_user_info = () => {
@@ -202,6 +315,11 @@ const handle_logout = () => {
 }
 .el-menu {
   border-right: none;
+  /* 开启 Flex 布局 */
+  display: flex;
+  flex-direction: column;
+  /* 高度 = 屏幕总高度(100vh) - 顶部Logo高度(60px) */
+  height: calc(100vh - 60px); 
 }
 .el-menu-item.is-active {
   background-color: #409eff20 !important;
