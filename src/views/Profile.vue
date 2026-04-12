@@ -125,12 +125,32 @@
 
             <el-form-item>
               <el-button type="primary" @click="save_profile">保存修改</el-button>
+			                <el-button type="danger" plain @click="password_dialog_visible = true">修改密码</el-button>
             </el-form-item>
           </el-form>
         </el-card>
       </el-col>
     </el-row>
   </div>
+  
+  <!-- 【新增】修改密码弹窗 -->
+      <el-dialog v-model="password_dialog_visible" title="修改账户密码" width="400px">
+        <el-form :model="password_form" label-position="top">
+          <el-form-item label="旧密码" required>
+            <el-input v-model="password_form.old_password" type="password" show-password />
+          </el-form-item>
+          <el-form-item label="新密码" required>
+            <el-input v-model="password_form.new_password" type="password" show-password />
+          </el-form-item>
+          <el-form-item label="确认新密码" required>
+            <el-input v-model="password_form.confirm_password" type="password" show-password />
+          </el-form-item>
+        </el-form>
+        <template #footer>
+          <el-button @click="password_dialog_visible = false">取消</el-button>
+          <el-button type="primary" @click="submit_change_password">确认修改</el-button>
+        </template>
+      </el-dialog>
 </template>
 
 <script setup>
@@ -148,6 +168,32 @@ const custom_colors =[
   { color: '#5cb87a', percentage: 100 }
 ]
 
+// 【新增】密码修改相关
+const password_dialog_visible = ref(false)
+const password_form = ref({
+  old_password: '',
+  new_password: '',
+  confirm_password: ''
+})
+
+// 【新增】提交密码修改
+const submit_change_password = async () => {
+  if (password_form.value.new_password !== password_form.value.confirm_password) {
+    ElMessage.error('两次输入的新密码不一致')
+    return
+  }
+  try {
+    const res = await request.post('/sysUser/change_password', {
+      old_password: password_form.value.old_password,
+      new_password: password_form.value.new_password
+    })
+    ElMessage.success(res.message) // 显示后端返回的“请重新登录”
+    
+    // 清除本地登录信息并跳转到登录页
+    localStorage.clear()
+    router.push('/login')
+  } catch (error) {}
+}
 // 获取个人资料
 const load_profile = async () => {
   const res = await request.get('/sysUser/profile')

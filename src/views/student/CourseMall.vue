@@ -18,6 +18,30 @@
           <el-button link type="primary" @click="filter_by_my_city" style="margin-left: 10px;">只看同城</el-button>
         </el-col>
       </el-row>
+	  
+	          <el-divider style="margin: 15px 0;" />
+	          <div class="category-filter">
+	            <span class="filter-label">按科目筛选：</span>
+	            <div class="category-tags">
+	              <!-- “全部” 按钮，点击时清空筛选 -->
+	              <el-check-tag 
+	                :checked="!query_params.category_id" 
+	                @change="select_category(null)"
+	              >
+	                全部
+	              </el-check-tag>
+	              <!-- 动态生成的科目按钮 -->
+	              <el-check-tag 
+	                v-for="cat in category_list" 
+	                :key="cat.id"
+	                :checked="query_params.category_id === cat.id"
+	                @change="select_category(cat.id)"
+	              >
+	                {{ cat.name }}
+	              </el-check-tag>
+	            </div>
+	          </div>
+	  
     </el-card>
 
     <!-- 2. 【新增】猜你喜欢 (专属推荐展位) -->
@@ -123,7 +147,30 @@ const loading = ref(false)
 const course_list = ref([])
 const total = ref(0)
 const user_info = ref(JSON.parse(localStorage.getItem('userInfo') || '{}'))
+// 【新增】分类列表
+const category_list = ref([])
 
+// 【新增】获取所有科目分类的方法
+const get_categories = async () => {
+  try {
+    // 假设你已经在后端 CategoryController 里写了一个简单的 list 接口
+    const res = await request.get('/category/list', { params: { type: 1 } }) // type=1 代表查科目
+    category_list.value = res.data
+  } catch (error) {}
+}
+
+// 【新增】点击分类标签时触发
+const select_category = (category_id) => {
+  query_params.value.category_id = category_id
+  handle_search() // 调用之前的搜索方法，刷新列表
+}
+
+// 【修改】在 onMounted 中调用获取分类的方法
+onMounted(() => {
+  get_list()
+  get_categories() // 【追加】
+  // ...
+})
 // 大厅列表的查询参数
 const query_params = ref({
   page_num: 1,
@@ -302,5 +349,25 @@ onMounted(() => {
 .no-cover-text {
   font-size: 14px;
   letter-spacing: 1px;
+}
+/* 分类筛选样式 */
+.category-filter {
+  display: flex;
+  align-items: center;
+}
+.filter-label {
+  font-size: 14px;
+  color: #606266;
+  margin-right: 15px;
+  flex-shrink: 0;
+}
+.category-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.el-check-tag {
+  font-size: 14px;
+  padding: 4px 12px;
 }
 </style>
