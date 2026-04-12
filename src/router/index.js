@@ -233,7 +233,13 @@ const routes = [{
 				          name: 'TutorSchedule',
 				          component: () => import('../views/tutor/TutorSchedule.vue'),
 				          meta: { title: '我的教学日程' }
-				        }
+				        },
+						{
+						        path: '/course-category-manage',
+						        name: 'CourseCategoryManage',
+						        component: () => import('../views/admin/CourseCategoryManage.vue'),
+						        meta: { title: '课程与分类管理' }
+						      }
 		]
 	}
 ]
