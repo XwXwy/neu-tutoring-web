@@ -220,7 +220,20 @@ const routes = [{
 			        name: 'TutorWallet',
 			        component: () => import('../views/tutor/TutorWallet.vue'),
 			        meta: { title: '我的钱包与报表' }
-			      }
+			      },
+				  // ... 其他路由 ...
+				        {
+				          path: '/student-bill',
+				          name: 'StudentBill',
+				          component: () => import('../views/student/StudentBill.vue'),
+				          meta: { title: '费用明细与账单' }
+				        },
+				        {
+				          path: '/tutor-schedule',
+				          name: 'TutorSchedule',
+				          component: () => import('../views/tutor/TutorSchedule.vue'),
+				          meta: { title: '我的教学日程' }
+				        }
 		]
 	}
 ]

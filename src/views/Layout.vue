@@ -59,6 +59,10 @@
         <el-menu-item v-if="user_info.role === 1" index="/tutor-course">
           <el-icon><Management /></el-icon><span>我的课程</span>
         </el-menu-item>
+		<el-menu-item v-if="user_info.role === 1" index="/tutor-schedule">
+		          <el-icon><Calendar /></el-icon>
+		          <span>日程管理</span>
+		        </el-menu-item>
         <el-menu-item v-if="user_info.role === 1" index="/order-manage">
           <el-icon><List /></el-icon><span>订单管理</span>
         </el-menu-item>
@@ -70,6 +74,11 @@
 		          <el-icon><Ticket /></el-icon>
 		          <span>我的订单</span>
 		        </el-menu-item>
+				
+				<el-menu-item v-if="user_info.role === 2" index="/student-bill">
+				          <el-icon><Money /></el-icon>
+				          <span>费用明细</span>
+				        </el-menu-item>
 				
 
 

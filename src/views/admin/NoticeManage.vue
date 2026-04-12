@@ -19,7 +19,7 @@
     <!-- 公告列表 -->
     <el-card shadow="never">
       <el-table :data="notice_list" v-loading="loading" style="width: 100%">
-        <el-table-column prop="id" label="ID" width="80" />
+        <el-table-column prop="id" label="ID" width="180" />
         <el-table-column prop="title" label="公告标题" show-overflow-tooltip />
         <el-table-column prop="type" label="类型" width="120">
           <template #default="scope">
