@@ -16,16 +16,23 @@
             <p>请在右侧目录选择要学习的课件或视频</p>
           </div>
           
-          <!-- 2. 如果是视频 (resource_type === 1) -->
-          <div v-else-if="current_resource.resource_type === 1" class="video-container">
-            <video 
-              :src="current_resource.resource_url" 
-              controls 
-              autoplay 
-              controlslist="nodownload"
-              class="video-player"
-            ></video>
-          </div>
+<!-- 2. 如果是视频 (resource_type === 1)，加上防盗版水印 -->
+          <el-watermark 
+            v-else-if="current_resource.resource_type === 1" 
+            :content="[user_info.username + ' 专属', user_info.phone]" 
+            :font="watermark_font"
+            class="video-watermark-wrapper"
+          >
+            <div class="video-container">
+              <video 
+                :src="current_resource.resource_url" 
+                controls 
+                autoplay 
+                controlslist="nodownload"
+                class="video-player"
+              ></video>
+            </div>
+          </el-watermark>
           
           <!-- 3. 如果是文档 (resource_type === 0) -->
           <div v-else class="doc-container">
@@ -94,7 +101,13 @@ const loading = ref(true)
 const course_id = ref(null)
 const resource_list = ref([])
 const current_resource = ref({})
+const user_info = ref(JSON.parse(localStorage.getItem('userInfo') || '{}'))
 
+// 配置水印文字颜色为半透明白色，适应黑色的视频背景
+const watermark_font = ref({
+  color: 'rgba(130, 130, 130, 0.1)',
+  fontSize: 16
+})
 // 加载该课程的所有教学资料
 const load_resources = async () => {
   loading.value = true
@@ -261,4 +274,11 @@ onMounted(() => {
   text-overflow: ellipsis;
   max-width: 180px;
 }
+
+.video-watermark-wrapper {
+  width: 100%;
+  height: 500px;
+  background-color: #000;
+}
+/* 原有的 .video-container 保持 height: 100% 即可 */
 </style>

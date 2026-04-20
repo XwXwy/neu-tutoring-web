@@ -185,12 +185,16 @@
 				</el-dropdown>
 			</el-header>
 
-			<!-- 主内容区 -->
+<!-- 主内容区 -->
 			<el-main>
 				<el-scrollbar>
-					<!-- 给子页面套上一层卡片，增加质感 -->
-					<el-card shadow="never" style="border-radius: 8px;">
-						<router-view></router-view>
+					<el-card shadow="never" style="border-radius: 8px; min-height: calc(100vh - 120px);">
+						<router-view v-slot="{ Component, route }">
+							<!-- 只保留 KeepAlive 缓存，彻底移除 transition 动画，避免渲染冲突 -->
+							<keep-alive>
+								<component :is="Component" :key="route.path" />
+							</keep-alive>
+						</router-view>
 					</el-card>
 				</el-scrollbar>
 			</el-main>
@@ -403,4 +407,5 @@
 		background-color: #f0f2f5;
 		padding: 16px;
 	}
+
 </style>

@@ -5,6 +5,9 @@ import {
 import {
 	ElMessage
 } from 'element-plus'
+import NProgress from 'nprogress'
+import 'nprogress/nprogress.css'
+
 const routes = [{
 		path: '/',
 		redirect: '/login'
@@ -250,6 +253,9 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from, next) => {
+	
+	  NProgress.start() // 开启进度条
+	
 	const userJson = localStorage.getItem('userInfo')
 	const user = userJson ? JSON.parse(userJson) : null
 
@@ -275,6 +281,11 @@ router.beforeEach((to, from, next) => {
 	}
 
 	next()
+})
+
+
+router.afterEach(() => {
+  NProgress.done() // 关闭进度条
 })
 
 export default router
