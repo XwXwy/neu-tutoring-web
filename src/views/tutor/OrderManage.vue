@@ -36,7 +36,7 @@
 			            <el-tag v-if="scope.row.status === 6" type="danger">平台介入(纠纷中)</el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="220" fixed="right">
+        <el-table-column label="操作" width="120" fixed="right">
           <template #default="scope">
              <!-- 状态0 (待确认)：显示接单和拒单 -->
             <div v-if="scope.row.status === 0">
