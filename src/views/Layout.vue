@@ -5,15 +5,15 @@
 			<!-- Logo 区 -->
 			<div class="logo-box">
 				<img src="../assets/logo.png" alt="logo" class="logo-img" />
-				<span class="logo-text">家教管理后台</span>
+				<span class="logo-text">知行家教服务平台</span>
 			</div>
 
 			<!-- 滚动菜单区 -->
 			<el-scrollbar class="aside-scrollbar">
 				<el-menu 
-					active-text-color="#ffffff" 
+					active-text-color="#faf9f5" 
 					background-color="transparent" 
-					text-color="#94a3b8"
+					text-color="#b0aea5"
 					:default-active="$route.path" 
 					:router="true" 
 					class="commercial-menu"
@@ -135,34 +135,35 @@
 					</el-breadcrumb>
 				</div>
 				
-				<div class="header-right">
-					<el-dropdown trigger="click" placement="bottom-end">
-						<div class="user-profile">
-							<div class="user-info">
-								<span class="user-name">{{ user_info.real_name }}</span>
-								<span class="user-role">
-									<span class="role-dot" :class="'role-' + user_info.role"></span>
-									{{ user_info.role === 0 ? '系统管理员' : (user_info.role === 1 ? '家教老师' : '学生用户') }}
-								</span>
-							</div>
-							<el-avatar :size="38" :src="user_info.avatar || 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'" class="avatar-img" />
-						</div>
-						<template #dropdown>
-							<el-dropdown-menu class="commercial-dropdown">
-								<div class="dropdown-header">
-									<p class="dropdown-name">{{ user_info.username }}</p>
-									<p class="dropdown-email">{{ user_info.city || '未填写城市' }}</p>
-								</div>
-								<el-dropdown-item v-if="user_info.role !== 0" @click="router.push('/profile')">
-									<el-icon><User /></el-icon>个人中心
-								</el-dropdown-item>
-								<el-dropdown-item divided @click="handle_logout" class="logout-item">
-									<el-icon><SwitchButton /></el-icon>退出系统
-								</el-dropdown-item>
-							</el-dropdown-menu>
-						</template>
-					</el-dropdown>
-				</div>
+<div class="header-right">
+    <el-dropdown trigger="click" placement="bottom-end">
+        <div class="user-profile">
+            <div class="user-info">
+                <span class="user-name">{{ user_info.real_name }}</span>
+                <span class="user-role">
+                    <span class="role-dot" :class="'role-' + user_info.role"></span>
+                    {{ user_info.role === 0 ? '系统管理员' : (user_info.role === 1 ? '家教老师' : '学生用户') }}
+                </span>
+            </div>
+            <el-avatar :size="36" :src="user_info.avatar || 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'" class="avatar-img" />
+        </div>
+        <template #dropdown>
+
+            <el-dropdown-menu class="editorial-dropdown">
+                <div class="dropdown-header">
+                    <p class="dropdown-name">{{ user_info.username }}</p>
+                    <p class="dropdown-email">{{ user_info.city || '未填写城市' }}</p>
+                </div>
+                <el-dropdown-item v-if="user_info.role !== 0" @click="router.push('/profile')">
+                    <el-icon><User /></el-icon>个人中心
+                </el-dropdown-item>
+                <el-dropdown-item divided @click="handle_logout" class="logout-item">
+                    <el-icon><SwitchButton /></el-icon>退出系统
+                </el-dropdown-item>
+            </el-dropdown-menu>
+        </template>
+    </el-dropdown>
+</div>
 			</el-header>
 
 			<!-- 主内容区 -->
@@ -170,11 +171,9 @@
 				<el-scrollbar class="main-scrollbar" view-class="main-view">
 					<div class="content-wrapper">
 						<router-view v-slot="{ Component, route }">
-
-								<keep-alive>
-									<component :is="Component" :key="route.path" />
-								</keep-alive>
-
+							<keep-alive>
+								<component :is="Component" :key="route.path" />
+							</keep-alive>
 						</router-view>
 					</div>
 				</el-scrollbar>
@@ -197,14 +196,14 @@
 					/>
 				</el-form-item>
 				<div class="form-actions">
-					<el-button round @click="feedback_dialog_visible = false">取消</el-button>
-					<el-button type="primary" round :loading="submitting_feedback" @click="submit_feedback">提交反馈</el-button>
+					<el-button class="btn-secondary" @click="feedback_dialog_visible = false">取消</el-button>
+					<el-button class="btn-primary" :loading="submitting_feedback" @click="submit_feedback">提交反馈</el-button>
 				</div>
 			</el-form>
 
 			<div class="history-header">
 				<span class="history-title">历史反馈记录</span>
-				<el-button link type="primary" @click="load_my_feedbacks">
+				<el-button link class="btn-refresh" @click="load_my_feedbacks">
 					<el-icon><Refresh /></el-icon> 刷新
 				</el-button>
 			</div>
@@ -216,7 +215,7 @@
 						v-for="item in my_feedback_list" 
 						:key="item.id" 
 						:timestamp="item.create_time"
-						:type="item.status === 1 ? 'success' : 'primary'" 
+						:color="item.status === 1 ? 'var(--clr-terracotta)' : 'var(--clr-olive)'" 
 						placement="top"
 					>
 						<div class="timeline-card">
@@ -307,26 +306,49 @@ const handle_logout = () => {
 </script>
 
 <style scoped>
+/* ================= 调色板 & 字体变量 ================= */
+* {
+	--clr-parchment: #f5f4ed;
+	--clr-ivory: #faf9f5;
+	--clr-white: #ffffff;
+	--clr-near-black: #141413;
+	--clr-dark-surface: #30302e;
+	--clr-terracotta: #c96442;
+    /* 【新增】为退出按钮定义明确的危险色 */
+	--clr-danger-red: #b02a2a; 
+	--clr-coral: #d97757;
+	--clr-olive: #5e5d59;
+	--clr-stone: #87867f;
+	--clr-charcoal: #4d4c48;
+	--clr-warm-sand: #e8e6dc;
+	--clr-border-cream: #f0eee6;
+	--clr-border-warm: #e8e6dc;
+	--clr-warm-silver: #b0aea5;
+	--clr-ring-warm: #d1cfc5;
+	--clr-focus-blue: #3898ec;
+	
+	--font-serif: "Georgia", "Times New Roman", serif;
+	--font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
 /* ================= 全局布局 ================= */
 .commercial-layout {
 	height: 100vh;
 	width: 100vw;
 	overflow: hidden;
-	background-color: #f8fafc; /* 主体极浅灰背景 */
-	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+	background-color: var(--clr-parchment);
+	font-family: var(--font-sans);
+	color: var(--clr-near-black);
 }
 
-/* 隐藏原生全局滚动条 */
-::-webkit-scrollbar {
-	display: none;
-}
+::-webkit-scrollbar { display: none; }
 
 /* ================= 侧边栏设计 ================= */
 .commercial-aside {
-	background: #0B1121; /* 极深邃的藏青黑 */
+	background: var(--clr-near-black);
 	display: flex;
 	flex-direction: column;
-	border-right: 1px solid #1e293b;
+	border-right: 1px solid var(--clr-dark-surface);
 	z-index: 20;
 }
 
@@ -335,65 +357,58 @@ const handle_logout = () => {
 	align-items: center;
 	height: 64px;
 	padding: 0 24px;
-	background: #0B1121;
+	background: var(--clr-near-black);
+	border-bottom: 1px solid var(--clr-dark-surface);
 }
 
-.logo-img {
-	width: 28px;
-	height: 28px;
-}
+.logo-img { width: 28px; height: 28px; }
 
 .logo-text {
 	margin-left: 12px;
-	font-size: 16px;
-	font-weight: 600;
-	color: #f8fafc;
+	font-family: var(--font-serif);
+	font-size: 18px;
+	font-weight: 500;
+	color: var(--clr-ivory);
 	letter-spacing: 0.5px;
 }
 
-.aside-scrollbar {
-	flex: 1;
-	overflow: hidden;
-}
+.aside-scrollbar { flex: 1; overflow: hidden; }
 
 /* 菜单基础样式 */
 .commercial-menu {
 	border-right: none;
-	padding: 12px 12px 24px 12px;
+	padding: 16px 12px 24px 12px;
 }
 
-/* 菜单分组标题 */
 .menu-group-title {
 	font-size: 12px;
 	font-weight: 500;
-	color: #475569;
-	margin: 20px 0 8px 12px;
-	text-transform: uppercase;
-	letter-spacing: 1px;
+	color: var(--clr-stone);
+	margin: 24px 0 8px 12px;
+	letter-spacing: 0.5px;
 }
 
-/* 菜单项商业化设计 */
+/* 菜单项排版 */
 :deep(.el-menu-item),
 :deep(.el-sub-menu__title) {
-	height: 44px;
-	line-height: 44px;
-	border-radius: 6px;
+	height: 40px;
+	line-height: 40px;
+	border-radius: 8px;
 	margin-bottom: 4px;
 	font-size: 14px;
-	transition: all 0.2s ease;
+	color: var(--clr-warm-silver) !important;
 }
 
 :deep(.el-menu-item:hover),
 :deep(.el-sub-menu__title:hover) {
-	background-color: #1e293b !important;
-	color: #e2e8f0 !important;
+	background-color: var(--clr-dark-surface) !important;
+	color: var(--clr-ivory) !important;
 }
 
-/* 选中的高亮状态：无大面积背景，采用精美边框与浅色背景 */
 :deep(.el-menu-item.is-active) {
-	background-color: #1e293b !important;
-	color: #ffffff !important;
-	font-weight: 600;
+	background-color: var(--clr-dark-surface) !important;
+	color: var(--clr-ivory) !important;
+	font-weight: 500;
 	position: relative;
 }
 
@@ -404,59 +419,58 @@ const handle_logout = () => {
 	top: 50%;
 	transform: translateY(-50%);
 	height: 20px;
-	width: 4px;
-	background-color: #3b82f6; /* 亮蓝色指示条 */
+	width: 3px;
+	background-color: var(--clr-terracotta);
 	border-radius: 0 4px 4px 0;
 }
 
 /* ================= 侧边栏底部反馈卡片 ================= */
 .aside-footer {
 	padding: 16px;
-	background: #0B1121;
-	border-top: 1px solid rgba(255, 255, 255, 0.05);
+	background: var(--clr-near-black);
+	border-top: 1px solid var(--clr-dark-surface);
 }
 
 .feedback-card {
 	display: flex;
 	align-items: center;
 	padding: 12px;
-	background: linear-gradient(145deg, #1e293b, #0f172a);
-	border: 1px solid #334155;
+	background: var(--clr-dark-surface);
+	border: 1px solid transparent;
 	border-radius: 8px;
 	cursor: pointer;
-	transition: all 0.3s ease;
+	transition: all 0.2s ease;
 }
 
 .feedback-card:hover {
-	border-color: #3b82f6;
-	transform: translateY(-2px);
-	box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+	box-shadow: var(--clr-dark-surface) 0px 0px 0px 0px, var(--clr-ring-warm) 0px 0px 0px 1px;
 }
 
 .feedback-icon {
-	width: 36px;
-	height: 36px;
-	border-radius: 8px;
-	background: rgba(59, 130, 246, 0.1);
-	color: #3b82f6;
+	width: 32px;
+	height: 32px;
+	border-radius: 6px;
+	background: rgba(201, 100, 66, 0.15);
+	color: var(--clr-terracotta);
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	font-size: 18px;
+	font-size: 16px;
 	margin-right: 12px;
 }
 
 .feedback-text h4 {
 	margin: 0;
 	font-size: 13px;
-	color: #f1f5f9;
+	color: var(--clr-ivory);
 	font-weight: 500;
+	font-family: var(--font-serif);
 }
 
 .feedback-text p {
 	margin: 2px 0 0 0;
 	font-size: 11px;
-	color: #64748b;
+	color: var(--clr-warm-silver);
 }
 
 /* ================= 右侧主区域 ================= */
@@ -467,27 +481,28 @@ const handle_logout = () => {
 	overflow: hidden;
 }
 
-/* 现代化顶部 Header */
+/* 顶部 Header */
 .commercial-header {
 	height: 64px;
-	background: rgba(255, 255, 255, 0.9);
-	backdrop-filter: blur(10px);
-	border-bottom: 1px solid #e2e8f0;
+	background: var(--clr-ivory);
+	border-bottom: 1px solid var(--clr-border-warm);
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	padding: 0 24px;
+	padding: 0 32px;
 	z-index: 10;
 }
 
-/* 面包屑美化 */
+/* 面包屑 */
 :deep(.el-breadcrumb__inner) {
-	color: #64748b !important;
+	color: var(--clr-stone) !important;
 	font-weight: 400;
 }
 :deep(.current-page .el-breadcrumb__inner) {
-	color: #0f172a !important;
-	font-weight: 600;
+	color: var(--clr-near-black) !important;
+	font-weight: 500;
+	font-family: var(--font-serif);
+	font-size: 1.1rem;
 }
 
 /* 用户信息区 */
@@ -495,13 +510,12 @@ const handle_logout = () => {
 	display: flex;
 	align-items: center;
 	cursor: pointer;
-	padding: 4px 6px;
-	border-radius: 40px;
+	padding: 6px;
+	border-radius: 12px;
 	transition: background 0.2s;
 }
-.user-profile:hover {
-	background: #f1f5f9;
-}
+.user-profile:hover { background: var(--clr-border-cream); }
+
 .user-info {
 	display: flex;
 	flex-direction: column;
@@ -510,131 +524,123 @@ const handle_logout = () => {
 }
 .user-name {
 	font-size: 14px;
-	font-weight: 600;
-	color: #1e293b;
-	line-height: 1.2;
+	font-weight: 500;
+	color: var(--clr-near-black);
 }
 .user-role {
 	font-size: 12px;
-	color: #64748b;
-	margin-top: 4px;
+	color: var(--clr-olive);
+	margin-top: 2px;
 	display: flex;
 	align-items: center;
 }
 
-/* 角色身份小圆点 */
 .role-dot {
 	width: 6px;
 	height: 6px;
 	border-radius: 50%;
 	margin-right: 6px;
 }
-.role-0 { background-color: #ef4444; box-shadow: 0 0 4px rgba(239, 68, 68, 0.4); } /* 管理员红 */
-.role-1 { background-color: #3b82f6; box-shadow: 0 0 4px rgba(59, 130, 246, 0.4); } /* 教师蓝 */
-.role-2 { background-color: #10b981; box-shadow: 0 0 4px rgba(16, 185, 129, 0.4); } /* 学生绿 */
+.role-0 { background-color: var(--clr-terracotta); }
+.role-1 { background-color: var(--clr-coral); }
+.role-2 { background-color: var(--clr-olive); }
 
 .avatar-img {
-	border: 2px solid #ffffff;
-	box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-}
-
-/* 用户下拉菜单美化 */
-.dropdown-header {
-	padding: 12px 16px;
-	border-bottom: 1px solid #f1f5f9;
-	margin-bottom: 4px;
-	background: #f8fafc;
-	border-radius: 6px 6px 0 0;
-}
-.dropdown-name {
-	margin: 0;
-	font-size: 14px;
-	font-weight: 600;
-	color: #1e293b;
-}
-.dropdown-email {
-	margin: 4px 0 0 0;
-	font-size: 12px;
-	color: #94a3b8;
-}
-.logout-item {
-	color: #ef4444 !important;
+	border: 1px solid var(--clr-border-warm);
 }
 
 /* ================= 主体内容区 ================= */
 .commercial-main {
 	padding: 0;
-	background-color: #f8fafc;
+	background-color: var(--clr-parchment);
 	height: calc(100vh - 64px);
 	overflow: hidden;
 }
-
-.main-scrollbar {
-	height: 100%;
-}
-
+.main-scrollbar { height: 100%; }
 .content-wrapper {
-	padding: 24px;
-	min-height: calc(100vh - 112px); /* 减去 Header 和 padding */
+	padding: 32px;
+	min-height: calc(100vh - 128px);
 }
 
-
-
+/* 全局卡片重塑 */
 :deep(.el-card) {
-	border: 1px solid #e2e8f0;
+	background-color: var(--clr-ivory) !important;
+	border: 1px solid var(--clr-border-cream) !important;
 	border-radius: 12px;
-	box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.02) !important;
+	box-shadow: rgba(0,0,0,0.03) 0px 4px 24px !important;
 }
 :deep(.el-card__header) {
-	border-bottom: 1px solid #f1f5f9;
-	background-color: #ffffff;
-	border-radius: 12px 12px 0 0;
+	border-bottom: 1px solid var(--clr-border-cream);
+	background-color: var(--clr-ivory);
+	padding: 20px 24px;
 }
 
-/* ================= 意见反馈弹窗商业化 ================= */
+/* ================= 按钮系统重构 ================= */
+.btn-primary {
+	background: var(--clr-terracotta) !important;
+	color: var(--clr-ivory) !important;
+	border: none !important;
+	padding: 8px 16px;
+	border-radius: 8px;
+	font-weight: 500;
+	box-shadow: var(--clr-terracotta) 0px 0px 0px 0px, var(--clr-terracotta) 0px 0px 0px 1px;
+}
+.btn-primary:hover { opacity: 0.9; }
+
+.btn-secondary {
+	background: var(--clr-warm-sand) !important;
+	color: var(--clr-charcoal) !important;
+	border: none !important;
+	padding: 8px 16px;
+	border-radius: 8px;
+	box-shadow: var(--clr-warm-sand) 0px 0px 0px 0px, var(--clr-ring-warm) 0px 0px 0px 1px;
+}
+.btn-secondary:hover { background: var(--clr-border-warm) !important; }
+
+/* ================= 意见反馈弹窗 ================= */
 :deep(.commercial-dialog) {
 	border-radius: 16px;
-	overflow: hidden;
+	background-color: var(--clr-ivory);
+	box-shadow: rgba(0,0,0,0.1) 0px 10px 40px;
 }
 :deep(.commercial-dialog .el-dialog__header) {
-	padding: 24px 24px 0;
+	padding: 32px 32px 0;
 	margin-right: 0;
-	border-bottom: none;
 }
 :deep(.commercial-dialog .el-dialog__title) {
-	font-weight: 600;
-	font-size: 18px;
-	color: #1e293b;
+	font-family: var(--font-serif);
+	font-weight: 500;
+	font-size: 25px;
+	color: var(--clr-near-black);
 }
 .dialog-subtitle {
-	font-size: 13px;
-	color: #64748b;
-	margin-top: 4px;
-	margin-bottom: 24px;
-	padding: 0 24px;
+	font-size: 15px;
+	color: var(--clr-olive);
+	margin-top: 8px;
+	margin-bottom: 32px;
+	padding: 0 32px;
 }
-.feedback-form {
-	padding: 0 24px;
-}
+.feedback-form { padding: 0 32px; }
+
 .custom-textarea :deep(.el-textarea__inner) {
-	background-color: #f8fafc;
-	border: 1px solid #e2e8f0;
+	background-color: var(--clr-parchment);
+	border: 1px solid var(--clr-border-warm);
 	border-radius: 8px;
-	padding: 12px;
-	font-size: 14px;
+	padding: 16px;
+	font-size: 15px;
+	color: var(--clr-near-black);
 	box-shadow: none;
-	transition: all 0.2s;
 }
 .custom-textarea :deep(.el-textarea__inner:focus) {
-	background-color: #ffffff;
-	border-color: #3b82f6;
-	box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+	background-color: var(--clr-white);
+	border-color: var(--clr-focus-blue);
+	box-shadow: 0 0 0 1px var(--clr-focus-blue);
 }
 .form-actions {
 	display: flex;
 	justify-content: flex-end;
 	gap: 12px;
-	margin-top: 20px;
+	margin-top: 24px;
 }
 
 /* 历史记录区 */
@@ -642,64 +648,120 @@ const handle_logout = () => {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	padding: 20px 24px 12px;
-	border-top: 1px solid #f1f5f9;
-	margin-top: 24px;
-	background: #fafafa;
+	padding: 24px 32px 12px;
+	border-top: 1px solid var(--clr-border-cream);
+	margin-top: 32px;
+	background: var(--clr-ivory);
 }
 .history-title {
-	font-size: 14px;
-	font-weight: 600;
-	color: #334155;
+	font-family: var(--font-serif);
+	font-size: 18px;
+	font-weight: 500;
+	color: var(--clr-near-black);
 }
+.btn-refresh { color: var(--clr-olive) !important; font-weight: 400; }
+.btn-refresh:hover { color: var(--clr-near-black) !important; }
+
 .history-list-container {
-	padding: 0 24px 24px;
-	background: #fafafa;
+	padding: 0 32px 32px;
+	background: var(--clr-ivory);
 	max-height: 280px;
 	overflow-y: auto;
 }
+.history-list-container::-webkit-scrollbar { width: 6px; }
+.history-list-container::-webkit-scrollbar-thumb { background: var(--clr-border-warm); border-radius: 8px; }
 
-/* 隐藏历史记录原生滚动条 */
-.history-list-container::-webkit-scrollbar {
-	width: 4px;
-}
-.history-list-container::-webkit-scrollbar-thumb {
-	background: #cbd5e1;
-	border-radius: 4px;
-}
+.commercial-timeline { padding-top: 12px; }
 
-.commercial-timeline {
-	padding-top: 8px;
-}
 .timeline-card {
-	background: #ffffff;
-	border: 1px solid #e2e8f0;
+	background: var(--clr-parchment);
+	border: 1px solid var(--clr-border-cream);
 	border-radius: 8px;
-	padding: 12px 16px;
-	box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+	padding: 16px;
 }
 .user-msg {
-	font-size: 14px;
-	color: #334155;
-	line-height: 1.5;
+	font-size: 15px;
+	color: var(--clr-near-black);
 }
 .reply-msg {
-	margin-top: 10px;
-	padding-top: 10px;
-	border-top: 1px dashed #e2e8f0;
-	font-size: 13px;
-	color: #0f766e;
-	line-height: 1.5;
+	margin-top: 12px;
+	padding-top: 12px;
+	border-top: 1px solid var(--clr-border-warm);
+	font-size: 14px;
+	color: var(--clr-terracotta);
 }
-.reply-label {
-	font-weight: 600;
-}
+.reply-label { font-weight: 500; }
 .wait-msg {
-	margin-top: 10px;
-	font-size: 12px;
-	color: #f59e0b;
+	margin-top: 12px;
+	font-size: 13px;
+	color: var(--clr-olive);
 	display: flex;
 	align-items: center;
 	gap: 6px;
+}
+
+/* ================= 用户下拉菜单 (【最终修正版】) ================= */
+/* 使用 :global 穿透作用域，确保能覆盖 Element Plus 的全局样式 */
+:global(.editorial-dropdown) {
+  border-radius: 12px !important;
+  border: 1px solid var(--clr-border-warm) !important;
+  background-color: var(--clr-ivory) !important;
+  box-shadow: rgba(0, 0, 0, 0.05) 0px 4px 24px !important;
+  padding: 4px !important;
+}
+
+/* 我们自己的菜单项样式 */
+:global(.editorial-dropdown .el-dropdown-menu__item) {
+  border-radius: 8px !important;
+  color: var(--clr-olive) !important;
+  padding: 8px 12px !important;
+  margin: 0 4px !important;
+}
+
+/* 【关键修复】:hover 和 :focus 状态必须同时覆盖，且背景色不能是 none */
+:global(.editorial-dropdown .el-dropdown-menu__item:not(.is-disabled):focus),
+:global(.editorial-dropdown .el-dropdown-menu__item:not(.is-disabled):hover) {
+  background-color: var(--clr-border-cream) !important;
+  color: var(--clr-near-black) !important;
+}
+
+/* 退出按钮的专属样式 */
+:global(.editorial-dropdown .logout-item) {
+  color: var(--clr-danger-red) !important;
+}
+:global(.editorial-dropdown .logout-item:not(.is-disabled):focus),
+:global(.editorial-dropdown .logout-item:not(.is-disabled):hover) {
+  background-color: rgba(176, 42, 42, 0.08) !important;
+  color: var(--clr-danger-red) !important;
+}
+
+/* 顶部的用户信息区 */
+.dropdown-header {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--clr-border-cream);
+  margin-bottom: 4px;
+}
+.dropdown-name { 
+  margin: 0; 
+  font-size: 14px; 
+  font-weight: 500; 
+  color: var(--clr-near-black); 
+}
+.dropdown-email { 
+  margin: 4px 0 0 0; 
+  font-size: 12px; 
+  color: var(--clr-stone); 
+}
+
+/* 分割线样式 */
+:global(.editorial-dropdown .el-dropdown-menu__item.is-divided::before) {
+    content: '';
+    height: 1px;
+    display: block;
+    background-color: var(--clr-border-cream);
+    position: absolute;
+    left: 8px;
+    right: 8px;
+    top: 0;
 }
 </style>

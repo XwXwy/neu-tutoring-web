@@ -32,12 +32,12 @@
         </div>
 
         <!-- 登录表单 -->
-        <el-form v-if="!is_register" :model="login_form" class="auth-form" @keyup.enter="handle_login">
+        <el-form v-if="!is_register" :model="login_form" class="auth-form">
           <el-form-item>
             <el-input v-model="login_form.username" placeholder="请输入账号" prefix-icon="User" size="large" clearable />
           </el-form-item>
           <el-form-item>
-            <el-input v-model="login_form.password" type="password" placeholder="请输入密码" prefix-icon="Lock" size="large" show-password />
+            <el-input v-model="login_form.password" type="password" placeholder="请输入密码" prefix-icon="Lock" size="large" @keyup.enter="handle_login" show-password />
           </el-form-item>
           <el-button type="primary" size="large" class="submit-btn" :loading="loading" @click="handle_login">
             立 即 登 录
@@ -49,7 +49,7 @@
         </el-form>
 
         <!-- 注册表单 -->
-        <el-form v-else :model="register_form" class="auth-form" @keyup.enter="handle_register" label-position="top">
+        <el-form v-else :model="register_form" class="auth-form" label-position="top">
           <!-- ... 注册表单内部字段保持与之前完全一致 ... -->
           <el-row :gutter="15">
             <el-col :span="12">

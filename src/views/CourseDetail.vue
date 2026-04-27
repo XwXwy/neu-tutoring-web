@@ -211,7 +211,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import request from '../utils/request'
 import { ElMessage, ElMessageBox } from 'element-plus'
@@ -386,6 +386,19 @@ onMounted(() => {
   load_free_resources()
   load_course_comments()
 })
+
+watch(
+  () => route.query.course_id,
+  (newId, oldId) => {
+    if (newId && newId !== oldId) {
+      // 重新加载课程详情数据
+      load_detail()
+	  load_free_resources()
+	  load_course_comments()
+    }
+  },
+  { immediate: true }
+)
 </script>
 
 <style scoped>
