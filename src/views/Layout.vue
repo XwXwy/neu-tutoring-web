@@ -145,7 +145,7 @@
                     {{ user_info.role === 0 ? '系统管理员' : (user_info.role === 1 ? '家教老师' : '学生用户') }}
                 </span>
             </div>
-            <el-avatar :size="36" :src="user_info.avatar || 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'" class="avatar-img" />
+            <el-avatar :size="36" :src="user_info.avatar || 'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&s=128'" class="avatar-img" />
         </div>
         <template #dropdown>
 
