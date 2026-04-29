@@ -72,7 +72,7 @@
         <el-card shadow="never" class="notice-card">
           <div class="card-header-title" style="display:flex; justify-content:space-between; width:100%;">
             <span><el-icon color="#E6A23C"><BellFilled /></el-icon> 平台公告</span>
-            <el-button link type="primary" @click="router.push('/notice_list')">更多 >></el-button>
+            <el-button link type="primary" @click="router.push('/notice-list')">更多 >></el-button>
           </div>
           <div v-if="notice_list.length > 0" class="notice-list">
             <div v-for="item in notice_list" :key="item.id" class="notice-item" @click="router.push({path:'/notice-detail', query:{id:item.id}})">
