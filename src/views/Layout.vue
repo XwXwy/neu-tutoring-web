@@ -171,9 +171,9 @@
 				<el-scrollbar class="main-scrollbar" view-class="main-view">
 					<div class="content-wrapper">
 						<router-view v-slot="{ Component, route }">
-							<keep-alive>
+							<!-- <keep-alive> -->
 								<component :is="Component" :key="route.path" />
-							</keep-alive>
+							<!-- </keep-alive> -->
 						</router-view>
 					</div>
 				</el-scrollbar>
