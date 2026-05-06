@@ -143,7 +143,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onActivated } from 'vue'
 import request from '../../utils/request'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { List, Warning } from '@element-plus/icons-vue'
@@ -210,7 +210,7 @@ const submit_refuse = async () => {
   get_list()
 }
 
-onMounted(() => {
+onActivated(() => {
   get_list()
 })
 </script>

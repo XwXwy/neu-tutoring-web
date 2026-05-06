@@ -57,7 +57,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onActivated } from 'vue'
 import { useRouter } from 'vue-router'
 import request from '../utils/request'
 import { Notification, ArrowLeft } from '@element-plus/icons-vue'
@@ -86,7 +86,7 @@ const go_to_detail = (id) => {
   router.push({ path: '/notice-detail', query: { id } })
 }
 
-onMounted(() => {
+onActivated(() => {
   get_list()
 })
 </script>

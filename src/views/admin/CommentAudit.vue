@@ -93,7 +93,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onActivated } from 'vue'  // 引入 onActivated
 import request from '../../utils/request'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Filter, Delete } from '@element-plus/icons-vue'
@@ -145,7 +145,8 @@ const handle_delete = (comment_id) => {
   }).catch(() => {})
 }
 
-onMounted(() => {
+// 使用 activated 钩子：每次进入该页面（包括首次挂载和从缓存中切回）都会重新获取数据
+onActivated(() => {
   get_list()
 })
 </script>

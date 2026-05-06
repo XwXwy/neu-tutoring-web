@@ -80,7 +80,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onActivated } from 'vue'
 import request from '../../utils/request'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Warning } from '@element-plus/icons-vue'
@@ -131,7 +131,7 @@ const handle_resolve = (order, resolve_type) => {
   })
 }
 
-onMounted(() => {
+onActivated(() => {
   get_list()
 })
 </script>

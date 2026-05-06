@@ -132,7 +132,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, nextTick, markRaw } from 'vue'
+import { ref, onMounted, onActivated, onUnmounted, nextTick, markRaw } from 'vue'
 import request from '../utils/request'
 import { useRouter } from 'vue-router'
 import * as echarts from 'echarts'
@@ -169,6 +169,7 @@ const tooltip_config = {
 }
 
 const load_dashboard_data = async () => {
+  loading.value = true
   try {
     const res = await request.get('/dashboard/statistics')
     stat_data.value = res.data
@@ -184,9 +185,23 @@ const load_dashboard_data = async () => {
   }
 }
 
+// 销毁所有图表实例
+const dispose_all_charts = () => {
+  chart_instances.forEach(chart => {
+    if (chart && !chart.isDisposed()) {
+      chart.dispose()
+    }
+  })
+  chart_instances = []
+}
+
 // 1. 环形图 (高对比度人文色板)
 const init_status_chart = (data) => {
   if (!chart_status_ref.value) return
+  // 先销毁该容器的旧实例
+  const existing = echarts.getInstanceByDom(chart_status_ref.value)
+  if (existing) existing.dispose()
+  
   const chart = markRaw(echarts.init(chart_status_ref.value))
   chart_instances.push(chart)
   
@@ -230,6 +245,10 @@ const init_status_chart = (data) => {
 // 2. 条形图 (陶土红渐变)
 const init_subject_chart = (data) => {
   if (!chart_subject_ref.value || !data) return
+  // 先销毁该容器的旧实例
+  const existing = echarts.getInstanceByDom(chart_subject_ref.value)
+  if (existing) existing.dispose()
+  
   const chart = markRaw(echarts.init(chart_subject_ref.value))
   chart_instances.push(chart)
   
@@ -264,6 +283,10 @@ const init_subject_chart = (data) => {
 // 3. 趋势图 (沉静折柱)
 const init_trend_chart = (data) => {
   if (!chart_trend_ref.value || !data) return
+  // 先销毁该容器的旧实例
+  const existing = echarts.getInstanceByDom(chart_trend_ref.value)
+  if (existing) existing.dispose()
+  
   const chart = markRaw(echarts.init(chart_trend_ref.value))
   chart_instances.push(chart)
   
@@ -309,17 +332,28 @@ const init_trend_chart = (data) => {
 }
 
 const handle_resize = () => {
-  chart_instances.forEach(chart => chart.resize())
+  chart_instances.forEach(chart => {
+    if (chart && !chart.isDisposed()) {
+      chart.resize()
+    }
+  })
 }
 
+// DOM 挂载后初始化（只需一次）
 onMounted(() => {
-  load_dashboard_data()
   window.addEventListener('resize', handle_resize)
 })
 
+// 每次进入页面时重新加载数据并重建图表
+onActivated(() => {
+  dispose_all_charts()
+  load_dashboard_data()
+})
+
+// 组件销毁时清理
 onUnmounted(() => {
   window.removeEventListener('resize', handle_resize)
-  chart_instances.forEach(chart => chart.dispose())
+  dispose_all_charts()
 })
 </script>
 

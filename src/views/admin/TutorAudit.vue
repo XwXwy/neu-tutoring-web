@@ -67,7 +67,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onActivated } from 'vue'
 import request from '../../utils/request'
 import { ElMessage, ElMessageBox } from 'element-plus'
 
@@ -105,7 +105,7 @@ const handleAudit = (row, status) => {
   }).catch(() => {})
 }
 
-onMounted(() => {
+onActivated(() => {
   getList()
 })
 </script>

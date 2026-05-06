@@ -70,7 +70,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onActivated } from 'vue'
 import request from '../../utils/request'
 import { List } from '@element-plus/icons-vue'
 
@@ -90,7 +90,7 @@ const get_list = async () => {
   loading.value = false
 }
 
-onMounted(() => {
+onActivated(() => {
   get_list()
 })
 </script>

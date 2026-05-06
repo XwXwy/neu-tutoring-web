@@ -228,7 +228,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, onActivated, computed } from 'vue'
 import request from '../utils/request'
 import { ElMessage } from 'element-plus'
 import { useRouter } from 'vue-router'
@@ -318,7 +318,13 @@ const handle_teacher_cert_success = (res) => {
   }
 }
 
+// 首次挂载时加载
 onMounted(() => {
+  load_profile()
+})
+
+// 从缓存中恢复时刷新（防止在个人中心修改后回来看到旧数据）
+onActivated(() => {
   load_profile()
 })
 </script>

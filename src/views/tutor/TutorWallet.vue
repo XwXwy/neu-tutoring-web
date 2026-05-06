@@ -122,7 +122,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, nextTick, markRaw } from 'vue'
+import { ref, onMounted, onActivated, nextTick, markRaw } from 'vue'
 import request from '../../utils/request'
 import { ElMessage } from 'element-plus'
 import * as echarts from 'echarts'
@@ -237,9 +237,14 @@ const load_chart = async () => {
   }
 }
 
+// 图表初始化只需执行一次，保留在 onMounted 中
 onMounted(() => {
-  load_info()
   nextTick(() => { load_chart() })
+})
+
+// 每次进入页面时刷新钱包数据和流水记录
+onActivated(() => {
+  load_info()
 })
 </script>
 

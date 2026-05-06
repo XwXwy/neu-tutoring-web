@@ -97,7 +97,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onActivated, computed } from 'vue'
 import request from '../../utils/request'
 import { Calendar } from '@element-plus/icons-vue'
 
@@ -162,7 +162,7 @@ const is_selected_day = (day_str) => {
   return day_str === format_date(selected_date.value)
 }
 
-onMounted(() => {
+onActivated(() => {
   get_schedule()
 })
 </script>

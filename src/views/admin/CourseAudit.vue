@@ -76,7 +76,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onActivated } from 'vue'
 import request from '../../utils/request'
 import { ElMessage, ElMessageBox } from 'element-plus'
 
@@ -106,7 +106,6 @@ const handle_audit = (row, status) => {
     {
       confirmButtonText: `确认${action_text}`,
       cancelButtonText: '取消',
-      // 根据操作状态动态分配确认按钮颜色
       confirmButtonClass: isApprove ? 'editorial-msgbox-btn-brand' : 'editorial-msgbox-btn-danger',
       cancelButtonClass: 'editorial-msgbox-btn-cancel',
       customClass: 'editorial-message-box',
@@ -120,7 +119,7 @@ const handle_audit = (row, status) => {
   }).catch(() => {})
 }
 
-onMounted(() => {
+onActivated(() => {
   get_list()
 })
 </script>

@@ -126,7 +126,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onActivated } from 'vue'
 import request from '../../utils/request'
 import { ElMessage } from 'element-plus'
 import { Service } from '@element-plus/icons-vue'
@@ -180,7 +180,7 @@ const submit_reply = async () => {
   get_list()
 }
 
-onMounted(() => { get_list() })
+onActivated(() => { get_list() })
 </script>
 
 <style scoped>

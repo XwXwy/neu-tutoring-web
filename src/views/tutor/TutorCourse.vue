@@ -245,7 +245,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onActivated } from 'vue'
 import request from '../../utils/request'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { FolderOpened, Upload, Check, Picture, Plus } from '@element-plus/icons-vue'
@@ -407,7 +407,7 @@ const delete_resource = (resource_id) => {
   }).catch(() => {})
 }
 
-onMounted(() => {
+onActivated(() => {
   get_course_list()
 })
 </script>

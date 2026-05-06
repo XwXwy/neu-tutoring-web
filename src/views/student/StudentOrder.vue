@@ -201,7 +201,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onActivated } from 'vue'
 import request from '../../utils/request'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Ticket, Timer, Warning, CircleCheck, ChatDotRound, Platform } from '@element-plus/icons-vue'
@@ -312,7 +312,7 @@ const apply_refund = (order_id) => {
   }).catch(() => {})
 }
 
-onMounted(() => { get_list() })
+onActivated(() => { get_list() })
 </script>
 
 <style scoped>

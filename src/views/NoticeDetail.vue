@@ -34,7 +34,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onActivated, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import request from '../utils/request'
 import markdownit from 'markdown-it'
@@ -55,6 +55,7 @@ const render_markdown = (text) => {
 const load_detail = async () => {
   const id = route.query.id
   if (!id) return
+  loading.value = true
   try {
     const res = await request.get('/notice/detail', { params: { id } })
     notice.value = res.data
@@ -63,8 +64,23 @@ const load_detail = async () => {
   }
 }
 
+// 首次挂载时加载
 onMounted(() => {
   load_detail()
+})
+
+// 从缓存中激活时，检查公告ID是否变化
+onActivated(() => {
+  if (notice.value.id && notice.value.id != route.query.id) {
+    load_detail()
+  }
+})
+
+// 监听路由参数变化（查看不同公告时）
+watch(() => route.query.id, (newId, oldId) => {
+  if (newId && newId !== oldId) {
+    load_detail()
+  }
 })
 </script>
 

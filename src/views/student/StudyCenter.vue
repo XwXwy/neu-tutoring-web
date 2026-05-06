@@ -68,7 +68,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onActivated } from 'vue'
 import request from '../../utils/request'
 import { useRouter } from 'vue-router'
 import { Collection, Picture } from '@element-plus/icons-vue'
@@ -86,7 +86,7 @@ const go_study = (id) => {
   router.push({ path: '/study-room', query: { course_id: id } })
 }
 
-onMounted(load_data)
+onActivated(load_data)
 </script>
 
 <style scoped>

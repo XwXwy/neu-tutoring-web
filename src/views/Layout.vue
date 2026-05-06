@@ -235,7 +235,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onActivated, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import request from '../utils/request'
 import { ElMessage } from 'element-plus'
@@ -289,9 +289,15 @@ const load_user_info = () => {
     }
 }
 
+// 用户信息只需首次加载，并监听自定义事件更新
 onMounted(() => {
     load_user_info()
     window.addEventListener('user_info_updated', load_user_info)
+})
+
+// 每次进入页面时刷新用户信息（防止在其他页面修改了个人信息）
+onActivated(() => {
+    load_user_info()
 })
 
 onUnmounted(() => {

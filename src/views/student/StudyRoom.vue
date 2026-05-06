@@ -99,7 +99,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onActivated, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import request from '../../utils/request'
 import { ElMessage } from 'element-plus'
@@ -125,6 +125,7 @@ const load_resources = async () => {
   
   if (!course_id.value) {
     ElMessage.error('缺少课程ID参数')
+    loading.value = false
     return
   }
 
@@ -137,7 +138,9 @@ const load_resources = async () => {
     if (resource_list.value.length > 0) {
       play_resource(resource_list.value[0])
     }
-  } catch (error) {}
+  } catch (error) {
+    console.error('加载课程资源失败', error)
+  }
   
   loading.value = false
 }
@@ -157,8 +160,23 @@ const play_resource = async (resource) => {
   }
 }
 
+// 首次挂载时加载
 onMounted(() => {
   load_resources()
+})
+
+// 从缓存中激活时，如果课程ID变了就重新加载
+onActivated(() => {
+  if (course_id.value !== route.query.course_id) {
+    load_resources()
+  }
+})
+
+// 监听路由参数变化（同一页面切换不同课程时）
+watch(() => route.query.course_id, (newId, oldId) => {
+  if (newId && newId !== oldId) {
+    load_resources()
+  }
 })
 </script>
 

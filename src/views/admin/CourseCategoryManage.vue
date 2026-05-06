@@ -126,7 +126,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref, onActivated, watch } from 'vue'
 import request from '../../utils/request'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { useRouter } from 'vue-router'
@@ -232,7 +232,7 @@ const require_modify = (id) => {
   }).catch(() => {})
 }
 
-onMounted(() => {
+onActivated(() => {
   get_category_list()
   get_course_list()
 })

@@ -267,7 +267,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, onActivated, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import request from '../utils/request'
 import { ElMessage, ElMessageBox } from 'element-plus'
@@ -320,7 +320,7 @@ const submit_order = () => {
     if (valid) {
       try {
         await request.post('/order/create', order_form.value)
-        ElMessage.success('预约请求已发送，请到“我的订单”中查看状态')
+        ElMessage.success('预约请求已发送，请到"我的订单"中查看状态')
         book_dialog_visible.value = false
       } catch(error) {}
     } else {
@@ -376,7 +376,9 @@ const preview_visible = ref(false)
 const current_res = ref({})
 
 const load_free_resources = async () => {
-  const res = await request.get('/course_resource/list_by_course', { params: { course_id: route.query.course_id } })
+  const course_id = route.query.course_id
+  if (!course_id) return
+  const res = await request.get('/course_resource/list_by_course', { params: { course_id } })
   free_resources.value = res.data.filter(item => item.status === 1 && item.is_free === 1)
 }
 
@@ -396,6 +398,7 @@ const load_detail = async () => {
     ElMessage.error('课程ID丢失')
     return
   }
+  loading.value = true
   const res = await request.get('/course/detail', { params: { course_id } })
   course_info.value = res.data
   loading.value = false
@@ -421,11 +424,32 @@ const handle_admin_modify = () => {
   }).catch(() => {})
 }
 
+// 首次挂载时加载所有数据
 onMounted(() => {
   load_detail()
   load_free_resources()
   load_course_comments()
 })
+
+// 从缓存中激活时，检查课程ID是否变化，变化则重新加载
+onActivated(() => {
+  const current_course_id = route.query.course_id
+  if (course_info.value.id && course_info.value.id != current_course_id) {
+    load_detail()
+    load_free_resources()
+    load_course_comments()
+  }
+})
+
+// 监听路由参数变化（同一页面切换不同课程时）
+watch(() => route.query.course_id, (newId, oldId) => {
+  if (newId && newId !== oldId) {
+    load_detail()
+    load_free_resources()
+    load_course_comments()
+  }
+})
+</script>
 
 watch(
   () => route.query.course_id,

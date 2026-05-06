@@ -88,11 +88,12 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onActivated, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import request from '../utils/request'
 import { ElMessage } from 'element-plus'
 import { Location, ArrowRight, ChatSquare, Collection } from '@element-plus/icons-vue'
+
 const route = useRoute()
 const router = useRouter()
 const loading = ref(true)
@@ -147,12 +148,27 @@ const submit_report = async () => {
     ElMessage.success('举报已提交，平台将尽快核实处理')
     report_dialog_visible.value = false
   } catch (error) {
-    // 后端抛出的“您已经举报过该评论”会在这里被 request.js 拦截提示
+    // 后端抛出的"您已经举报过该评论"会在这里被 request.js 拦截提示
   }
 }
 
+// 首次挂载时加载
 onMounted(() => {
   load_tutor_data()
+})
+
+// 从缓存中激活时，检查家教ID是否变化
+onActivated(() => {
+  if (tutor_info.value.id && tutor_info.value.id != route.query.tutor_id) {
+    load_tutor_data()
+  }
+})
+
+// 监听路由参数变化（查看不同家教时）
+watch(() => route.query.tutor_id, (newId, oldId) => {
+  if (newId && newId !== oldId) {
+    load_tutor_data()
+  }
 })
 </script>
 

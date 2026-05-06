@@ -123,7 +123,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted,onActivated } from 'vue'
 import request from '../../utils/request'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Plus, Notification } from '@element-plus/icons-vue'
@@ -205,9 +205,7 @@ const handle_delete = (id) => {
   }).catch(() => {})
 }
 
-onMounted(() => {
-  get_list()
-})
+onActivated(() => { get_list() })
 </script>
 
 <style scoped>

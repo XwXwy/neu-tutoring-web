@@ -169,7 +169,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onActivated } from 'vue'
 import request from '../../utils/request'
 import { ElMessage } from 'element-plus'
 import { useRouter } from 'vue-router'
@@ -265,9 +265,14 @@ const go_detail = (id) => {
   router.push({ path: '/course-detail', query: { course_id: id } })
 }
 
+// 分类列表只需加载一次，放在 onMounted 中
 onMounted(() => {
+  get_categories()
+})
+
+// 每次进入页面时刷新课程列表和推荐列表
+onActivated(() => {
   get_list()
-  get_categories() 
   if (user_info.value.role === 2) {
     get_recommend_list()
   }

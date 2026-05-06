@@ -98,7 +98,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onActivated }from 'vue'
 import request from '../../utils/request'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Files, View, VideoPlay } from '@element-plus/icons-vue'
@@ -151,7 +151,7 @@ const handle_audit = (resource_id, status) => {
   }).catch(() => {})
 }
 
-onMounted(() => {
+onActivated(() => {
   get_list()
 })
 </script>
