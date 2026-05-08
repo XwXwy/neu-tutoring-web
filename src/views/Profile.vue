@@ -1,5 +1,17 @@
 <template>
   <div class="editorial-page-container">
+    
+    <!-- 【核心新增】状态为 3 时的全宽警告提示栏 -->
+    <div class="status-alert-banner" v-if="user_profile.status === 3">
+      <div class="alert-content">
+        <el-icon class="alert-icon"><WarningFilled /></el-icon>
+        <div class="alert-text">
+          <h3 class="serif-title alert-title">资质审核未通过</h3>
+          <p>您的家教资质未通过系统人工审核。请您仔细核对并更新右侧表单中的毕业院校、专业信息，或重新上传清晰的学历证书图片。修改完成后，请点击右上角的“重新提交审核”按钮。</p>
+        </div>
+      </div>
+    </div>
+
     <el-row :gutter="24">
       
       <!-- ================= 左侧：个人名片与统计 ================= -->
@@ -19,7 +31,8 @@
               <div class="avatar-hover-mask">更换头像</div>
             </el-upload>
             
-            <h2 class="profile-name serif-title">{{ user_profile.username }}</h2>
+            <h2 class="profile-name serif-title">{{ user_profile.real_name }}</h2>
+			<h2 class="profile-name serif-title">{{ user_profile.username }}</h2>
             <div class="role-badge" :class="'role-' + user_profile.role">
               {{ user_profile.role === 1 ? '家教老师' : '学生用户' }}
             </div>
@@ -85,12 +98,18 @@
 
       <!-- ================= 右侧：资料编辑表单 ================= -->
       <el-col :xs="24" :md="16">
-        <el-card shadow="never" class="editorial-card form-card">
+        <el-card shadow="never" class="editorial-card form-card" :class="{'card-error-border': user_profile.status === 3}">
           <div class="card-header">
             <h3 class="serif-title">基本信息设置</h3>
             <div class="header-actions">
               <button class="btn-text-danger" @click="password_dialog_visible = true">修改密码</button>
-              <button class="btn-brand" @click="save_profile">保存修改</button>
+              <!-- 【核心逻辑修改】如果是状态3，按钮文案和颜色改变 -->
+              <button 
+                :class="user_profile.status === 3 ? 'btn-danger' : 'btn-brand'" 
+                @click="save_profile"
+              >
+                {{ user_profile.status === 3 ? '重新提交审核' : '保存修改' }}
+              </button>
             </div>
           </div>
           
@@ -143,21 +162,43 @@
                   class="warm-textarea" 
                 />
               </el-form-item>
-              
-              <el-form-item label="教师资格证扫描件">
-                <el-upload
-                  class="cert-uploader"
-                  action="http://localhost:8080/file/upload"
-                  :show-file-list="false"
-                  :on-success="handle_teacher_cert_success"
-                >
-                  <img v-if="user_profile.teacher_cert" :src="user_profile.teacher_cert" class="cert-img" />
-                  <div v-else class="upload-placeholder">
-                    <el-icon><Plus /></el-icon>
-                    <span>点击上传证件</span>
-                  </div>
-                </el-upload>
-              </el-form-item>
+
+              <!-- 【核心新增】学历证书上传框 -->
+              <el-row :gutter="24">
+                <el-col :span="12">
+                  <el-form-item label="学历证书扫描件 (必填)">
+                    <el-upload
+                      class="cert-uploader"
+                      action="http://localhost:8080/file/upload"
+                      :show-file-list="false"
+                      :on-success="handle_degree_cert_success"
+                    >
+                      <img v-if="user_profile.degree_cert" :src="user_profile.degree_cert" class="cert-img" />
+                      <div v-else class="upload-placeholder">
+                        <el-icon><Plus /></el-icon>
+                        <span>点击上传证件</span>
+                      </div>
+                    </el-upload>
+                  </el-form-item>
+                </el-col>
+
+                <el-col :span="12">
+                  <el-form-item label="教师资格证扫描件 (选填)">
+                    <el-upload
+                      class="cert-uploader"
+                      action="http://localhost:8080/file/upload"
+                      :show-file-list="false"
+                      :on-success="handle_teacher_cert_success"
+                    >
+                      <img v-if="user_profile.teacher_cert" :src="user_profile.teacher_cert" class="cert-img" />
+                      <div v-else class="upload-placeholder">
+                        <el-icon><Plus /></el-icon>
+                        <span>点击上传证件</span>
+                      </div>
+                    </el-upload>
+                  </el-form-item>
+                </el-col>
+              </el-row>
             </template>
 
             <!-- 学生专属字段 -->
@@ -232,7 +273,7 @@ import { ref, onMounted, onActivated, computed } from 'vue'
 import request from '../utils/request'
 import { ElMessage } from 'element-plus'
 import { useRouter } from 'vue-router'
-import { Plus, StarFilled } from '@element-plus/icons-vue'
+import { Plus, StarFilled, WarningFilled } from '@element-plus/icons-vue' // 【补充图标引入】
 
 const router = useRouter()
 const user_profile = ref({})
@@ -273,16 +314,16 @@ const completion_rate = computed(() => {
   let filled = 0
   let total = 0
   
-  const base_keys = ['avatar', 'real_name', 'phone','city']
+  const base_keys =['avatar', 'real_name', 'phone','city']
   total += base_keys.length
   base_keys.forEach(k => { if (p[k]) filled++ })
 
   if (p.role === 1) { 
-    const tutor_keys = ['university', 'major', 'teaching_years', 'degree_cert', 'bio']
+    const tutor_keys =['university', 'major', 'teaching_years', 'degree_cert', 'bio']
     total += tutor_keys.length
     tutor_keys.forEach(k => { if (p[k] !== null && p[k] !== '') filled++ })
   } else if (p.role === 2) { 
-    const student_keys = ['grade', 'school', 'preference']
+    const student_keys =['grade', 'school', 'preference']
     total += student_keys.length
     student_keys.forEach(k => { if (p[k]) filled++ })
   }
@@ -291,9 +332,25 @@ const completion_rate = computed(() => {
 })
 
 const save_profile = async () => {
+  // 拦截：家教如果被驳回，重新提交时必须保证有学历证书
+  if (user_profile.value.role === 1 && !user_profile.value.degree_cert) {
+    ElMessage.warning('请重新上传您的学历证书！')
+    return
+  }
+
   await request.post('/sysUser/update_profile', user_profile.value)
+
+  // 【核心修改】如果是被驳回状态 (3) 重新提交的
+  if (user_profile.value.status === 3) {
+    ElMessage.success('审核申请已重新提交，请耐心等待管理员再次核实。')
+    // 强制踢出，让其重走闭环流程
+    localStorage.clear()
+    router.push('/login')
+    return
+  }
+
+  // 正常保存的逻辑
   ElMessage.success('个人资料已保存')
-  
   let local_user = JSON.parse(localStorage.getItem('userInfo') || '{}')
   local_user.avatar = user_profile.value.avatar      
   local_user.real_name = user_profile.value.real_name 
@@ -311,19 +368,25 @@ const handle_avatar_success = (res) => {
   }
 }
 
-const handle_teacher_cert_success = (res) => {
+// 【新增】学历证书上传回调
+const handle_degree_cert_success = (res) => {
   if (res.code === 200) {
-    user_profile.value.teacher_cert = res.data
-    ElMessage.success('教师证上传成功')
+    user_profile.value.degree_cert = res.data
+    ElMessage.success('学历证书更新成功')
   }
 }
 
-// 首次挂载时加载
+const handle_teacher_cert_success = (res) => {
+  if (res.code === 200) {
+    user_profile.value.teacher_cert = res.data
+    ElMessage.success('教师证更新成功')
+  }
+}
+
 onMounted(() => {
   load_profile()
 })
 
-// 从缓存中恢复时刷新（防止在个人中心修改后回来看到旧数据）
 onActivated(() => {
   load_profile()
 })
@@ -337,18 +400,18 @@ onActivated(() => {
   --clr-white: #ffffff;
   --clr-near-black: #141413;    
   
-  --clr-terracotta: #c96442;    /* 进度条/资金/品牌色 */
+  --clr-terracotta: #c96442;    
   --clr-coral: #d97757;         
-  --clr-danger-red: #b02a2a;    /* 修改密码操作 */
-  --clr-amber-warm: #d98f3e;    /* 评分星标/提示 */
+  --clr-danger-red: #b02a2a;    
+  --clr-amber-warm: #d98f3e;    
   
-  --clr-olive: #5e5d59;         /* 表单Label/次级文本 */
-  --clr-stone: #87867f;         /* 记录值/辅助说明 */
+  --clr-olive: #5e5d59;         
+  --clr-stone: #87867f;         
   --clr-charcoal: #4d4c48;      
   
-  --clr-warm-sand: #e8e6dc;     /* 进度条底轨/占位图 */
-  --clr-border-cream: #f0eee6;  /* 分割线 */
-  --clr-border-warm: #e8e6dc;   /* 输入框边框 */
+  --clr-warm-sand: #e8e6dc;     
+  --clr-border-cream: #f0eee6;  
+  --clr-border-warm: #e8e6dc;   
   --clr-focus-blue: #3898ec;
   
   --font-serif: "Georgia", "Times New Roman", serif;
@@ -358,6 +421,43 @@ onActivated(() => {
 .editorial-page-container {
   font-family: var(--font-sans);
   padding-bottom: 40px;
+}
+
+/* 【核心新增】状态异常警报栏的美化样式 */
+.status-alert-banner {
+  background-color: #fff1f0;
+  border-left: 4px solid var(--clr-danger-red);
+  padding: 20px 24px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 8px rgba(176, 42, 42, 0.05);
+}
+.alert-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+.alert-icon {
+  font-size: 24px;
+  color: var(--clr-danger-red);
+  margin-top: 2px;
+}
+.alert-text {
+  flex: 1;
+}
+.alert-title {
+  color: var(--clr-danger-red);
+  margin: 0 0 8px 0;
+  font-size: 18px;
+}
+.alert-text p {
+  margin: 0;
+  color: #4a4a4a;
+  font-size: 14px;
+  line-height: 1.6;
+}
+.card-error-border {
+  border-color: rgba(176, 42, 42, 0.3) !important;
 }
 
 /* ================= 柔和卡片系统 ================= */
@@ -409,7 +509,6 @@ onActivated(() => {
   border-bottom: 1px solid var(--clr-border-cream);
 }
 
-/* 头像上传 (带有优雅的悬停遮罩) */
 .avatar-uploader { position: relative; border-radius: 50%; overflow: hidden; margin-bottom: 20px; cursor: pointer; }
 .avatar-image { border: 2px solid var(--clr-white); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
 .avatar-placeholder { width: 100px; height: 100px; border-radius: 50%; background-color: var(--clr-warm-sand); display: flex; align-items: center; justify-content: center; font-size: 28px; color: var(--clr-stone); border: 2px dashed var(--clr-border-warm); }
@@ -425,7 +524,6 @@ onActivated(() => {
 .profile-section:last-child { border-bottom: none; }
 .section-title { font-size: 13px; color: var(--clr-stone); font-weight: 500; letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 16px; }
 
-/* 重写进度条 */
 .progress-box { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
 .warm-progress { flex: 1; }
 .warm-progress :deep(.el-progress-bar__outer) { background-color: var(--clr-border-warm) !important; border-radius: 4px; }
@@ -433,13 +531,11 @@ onActivated(() => {
 .progress-num { font-family: monospace; font-size: 14px; font-weight: 500; color: var(--clr-terracotta); }
 .progress-tip { font-size: 13px; color: var(--clr-amber-warm); margin: 0; line-height: 1.5; }
 
-/* 账号记录 */
 .record-list { display: flex; flex-direction: column; gap: 12px; }
 .record-item { display: flex; justify-content: space-between; align-items: center; font-size: 14px; }
 .record-label { color: var(--clr-olive); }
 .record-value { color: var(--clr-near-black); font-family: monospace; }
 
-/* 数据统计区 */
 .stat-section { background-color: var(--clr-parchment); }
 .stat-box { display: flex; flex-direction: column; gap: 8px; }
 .stat-label { font-size: 13px; color: var(--clr-olive); }
@@ -453,13 +549,18 @@ onActivated(() => {
 .header-actions { display: flex; align-items: center; gap: 16px; }
 .btn-text-danger { background: transparent; border: none; color: var(--clr-stone); font-size: 14px; font-weight: 500; cursor: pointer; transition: color 0.2s; padding: 0; }
 .btn-text-danger:hover { color: var(--clr-danger-red); }
+
+/* 原本的橙红色主按钮 */
 .btn-brand { background: var(--clr-terracotta) !important; color: var(--clr-ivory) !important; border: none; border-radius: 8px; padding: 8px 24px; font-weight: 500; box-shadow: var(--clr-terracotta) 0px 0px 0px 0px, var(--clr-terracotta) 0px 0px 0px 1px; cursor: pointer; transition: opacity 0.2s; }
 .btn-brand:hover { opacity: 0.9; }
+
+/* 驳回状态下专用的危险色按钮 */
+.btn-danger { background: var(--clr-danger-red) !important; color: var(--clr-ivory) !important; border: none; border-radius: 8px; padding: 8px 24px; font-weight: 500; box-shadow: var(--clr-danger-red) 0px 0px 0px 0px, var(--clr-danger-red) 0px 0px 0px 1px; cursor: pointer; transition: opacity 0.2s; }
+.btn-danger:hover { opacity: 0.9; }
 
 .editorial-form :deep(.el-form-item__label) { font-weight: 500; color: var(--clr-olive); font-size: 14px; padding-bottom: 6px; }
 .editorial-form :deep(.el-form-item) { margin-bottom: 20px; }
 
-/* 统一暖色输入框 */
 .warm-input :deep(.el-input__wrapper) { background-color: var(--clr-parchment); border: 1px solid var(--clr-border-warm); border-radius: 8px; box-shadow: none !important; transition: all 0.2s; }
 .warm-input :deep(.el-input__wrapper.is-focus) { background-color: var(--clr-white); box-shadow: 0 0 0 1px var(--clr-focus-blue) !important; }
 .warm-textarea :deep(.el-textarea__inner) { background-color: var(--clr-parchment); border: 1px solid var(--clr-border-warm); border-radius: 8px; padding: 12px; font-size: 14px; color: var(--clr-near-black); box-shadow: none !important; line-height: 1.6;}
@@ -470,7 +571,6 @@ onActivated(() => {
 :global(.warm-select-popper) { border-radius: 8px !important; border: 1px solid var(--clr-border-warm) !important; }
 :global(.warm-select-popper .el-select-dropdown__item.selected) { color: var(--clr-terracotta) !important; font-weight: 500; }
 
-/* 证件上传相框 */
 .cert-uploader :deep(.el-upload) {
   border: 1px dashed var(--clr-stone); border-radius: 8px; cursor: pointer; position: relative; overflow: hidden;
   width: 240px; height: 160px; background-color: var(--clr-parchment); transition: all 0.2s ease;
@@ -488,6 +588,5 @@ onActivated(() => {
 .dialog-subtitle { font-size: 14px; color: var(--clr-danger-red); margin-top: -16px; margin-bottom: 24px; }
 
 .dialog-footer { padding-top: 12px; display: flex; justify-content: flex-end; gap: 12px; }
-.btn-danger { background: var(--clr-danger-red) !important; color: var(--clr-ivory) !important; border: none; border-radius: 8px; padding: 8px 24px; font-weight: 500; }
 .btn-secondary { background: var(--clr-warm-sand) !important; color: var(--clr-charcoal) !important; border: none; border-radius: 8px; padding: 8px 24px; font-weight: 500; }
 </style>

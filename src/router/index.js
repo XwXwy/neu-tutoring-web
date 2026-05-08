@@ -264,6 +264,14 @@ router.beforeEach((to, from, next) => {
 		return next('/login')
 	}
 
+  // 资质被驳回的家教，强制导向个人中心，禁止访问其他任何页面！
+  if (user && user.role === 1 && user.status === 3 && to.path !== '/profile') {
+    import('element-plus').then(({ ElMessage }) => {
+      ElMessage.error('您的资质未通过审核，请重新完善资料并提交！')
+    })
+    return next('/profile')
+  }
+
 	// 2. 权限拦截：非管理员试图进入管理员页面
 	const adminRoutes = ['/user-manage', '/tutor-audit', '/course-audit']
 	if (adminRoutes.includes(to.path) && user.role !== 0) {

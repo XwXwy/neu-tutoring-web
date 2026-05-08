@@ -201,6 +201,9 @@ import request from '../utils/request'
 import { ElMessage } from 'element-plus'
 import { useRouter } from 'vue-router'
 import { User, Lock, ArrowRight, Plus, Phone, Loading } from '@element-plus/icons-vue'
+import bg1 from '../assets/background1.jpg'
+import bg2 from '../assets/background2.jpg'
+import bg3 from '../assets/background3.jpg'
 
 const router = useRouter()
 const is_register = ref(false)
@@ -209,9 +212,9 @@ const is_agreed = ref(false)
 
 // 轮播图背景数组
 const bg_images = ref([
-  'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=1920&auto=format&fit=crop', 
-  'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?q=80&w=1920&auto=format&fit=crop', 
-  'https://images.unsplash.com/photo-1509062522246-3755977927d7?q=80&w=1920&auto=format&fit=crop'  
+  bg1,
+  bg2,
+  bg3
 ])
 
 const agreement_visible = ref(false)
@@ -546,8 +549,22 @@ const before_upload = (file) => {
   background-color: var(--clr-ivory);
 }
 .uploaded-img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.upload-placeholder { display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100%; color: var(--clr-olive); font-size: 13px; }
-.upload-placeholder .el-icon { font-size: 24px; margin-bottom: 8px; color: var(--clr-stone); }
+.upload-placeholder {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 150px;
+  height: 150px;
+  color: var(--clr-olive);
+  font-size: 13px;
+}
+
+.upload-placeholder .el-icon {
+  font-size: 24px;
+  margin-bottom: 8px;
+  color: var(--clr-stone);
+}
 
 /* ================= 底部协议区 ================= */
 .agreement-box { margin-top: 40px; text-align: center; }
